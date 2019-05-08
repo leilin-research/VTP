@@ -47,8 +47,9 @@ class highwayNet(nn.Module):
 
         # Encoder LSTM
         self.enc_lstm2 = torch.nn.LSTM(self.input_embedding_size,self.encoder_size,1)
-
         
+        self.spatial_embedding = nn.Linear(5, self.encoder_size)
+
         self.tanh = nn.Tanh()
         
         self.pre4att = nn.Sequential(
@@ -207,7 +208,7 @@ class highwayNet(nn.Module):
                         fut_pred.append(self.decode(enc_tmp)) # get six possible trajectories
                 return fut_pred, lat_pred, lon_pred
         else:
-            fut_pred = self.decode(enc) 
+            fut_pred = self.decode_by_step(enc) 
             return fut_pred, soft_attn_weights, soft_nbrs_attn_weights, soft_attn_weights_ha
 
 
@@ -221,6 +222,28 @@ class highwayNet(nn.Module):
         fut_pred = fut_pred.permute(1, 0, 2) # (25, 128, 5) 25 timesteps, 128 batchsize, 5 prediction
         fut_pred = outputActivation(fut_pred)
         return fut_pred
+
+    def decode_by_step(self,enc):
+        #print (enc.size()) # (128, 117)
+        pre_traj = []
+        #enc = enc.unsqueeze(0)
+        decoder_input = enc
+
+        for _ in range(self.out_length):
+            decoder_input = decoder_input.unsqueeze(0)
+            h_dec, _ = self.dec_lstm(decoder_input) # h_dec: (1, 128, 128)
+            h_for_pred = h_dec.squeeze()
+            fut_pred = self.op(h_for_pred) # 128, 5
+            pre_traj.append(fut_pred.view(fut_pred.size()[0], -1))
+            
+            embedding_input = fut_pred
+            decoder_input = self.spatial_embedding(embedding_input)
+
+        pre_traj = torch.stack(pre_traj, dim=0)
+        pre_traj = outputActivation(pre_traj)
+        return pre_traj
+
+
 
 
 
