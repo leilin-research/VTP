@@ -12,7 +12,7 @@ NGSIM data - the same processing procedure from the convolutional social pooling
 
 # 5-step RMSE:
 
-Conv_social: tensor([0.1002, 0.1964, 0.3096, 0.4328, 0.5594], device='cuda:0')
+Conv_social: tensor([0.1011, 0.1976, 0.3109, 0.4324, 0.5599], device='cuda:0'); training time: 3.30 hours
 
 HA-LSTM: tensor([0.1038, 0.2060, 0.3192, 0.4397, 0.5658], device='cuda:0')
 
