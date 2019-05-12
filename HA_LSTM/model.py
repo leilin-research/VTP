@@ -86,30 +86,16 @@ class highwayNet(nn.Module):
         self.relu = torch.nn.ReLU()
         self.softmax = torch.nn.Softmax(dim=1)
 
-    def attention_1(self, lstm_out_weight, lstm_out):
+    def attention(self, lstm_out_weight, lstm_out):
        
         alpha = F.softmax(lstm_out_weight, 1) # (batch_size, lstm_cell_num, 1), calculate weight along the 1st dimension
-        #print (alpha.size()) #(10, 75, 1)
+        #print (alpha.size()) #(128, 40, 1)
         #lstm_outs = lstm_outs.permute(0, 2, 1) # before: (batch_size,lstm_cell_num, hidden_dim); after: (batch_size, #hidden_dim, lstm_cell_num)
-        lstm_out = lstm_out.permute(0, 2, 1)#128, 64, 16
+        lstm_out = lstm_out.permute(0, 2, 1)#128, 64, 40/16
          
         new_hidden_state = torch.bmm(lstm_out, alpha).squeeze(2) # new_hidden_state-(batch_size, hidden_dim)
         new_hidden_state = F.relu(new_hidden_state)
          
-        #print (new_hidden_state.size()) # (10, 20)
-        #print (alpha)
-
-        return new_hidden_state, alpha#, soft_attn_weights_1#, soft_attn_weights_2
-
-    def attention_bidirec(self, lstm_outs, lstm_out_sum, lstm_out_weight):
-        alpha = F.softmax(lstm_out_weight, 1) # (batch_size, lstm_cell_num, 1), calculate weight along the 1st dimension
-        #print (alpha.size()) #(10, 75, 1)
-        #lstm_outs = lstm_outs.permute(0, 2, 1) # before: (batch_size,lstm_cell_num, hidden_dim); after: (batch_size, hidden_dim, lstm_cell_num)
-        lstm_out_sum = lstm_out_sum.permute(0, 2, 1)
-        
-        
-        new_hidden_state = torch.bmm(lstm_out_sum, alpha).squeeze(2) # new_hidden_state-(batch_size, hidden_dim)
-        new_hidden_state = F.relu(new_hidden_state)
         #print (new_hidden_state.size()) # (10, 20)
         #print (alpha)
 
@@ -125,13 +111,7 @@ class highwayNet(nn.Module):
         #print (lstm_out.size())
         lstm_weight = self.pre4att(self.tanh(lstm_out)) # 128, 16, 1
        # print (lstm_weight.size())
-        new_hidden, soft_attn_weights = self.attention_1(lstm_weight, lstm_out) # new_hidden: 128, 64
-        '''
-        lstm_out_sum = lstm_out[:,:,0:10] + lstm_out[:,:,10:20]
-        #print (lstm_out_sum.size())
-        lstm_weight = self.pre4att(self.tanh(lstm_out_sum)) #lstm_out
-        new_hidden, soft_attn_weights = self.attention_bidirec(lstm_out, lstm_out_sum, lstm_weight)
-	'''
+        new_hidden, soft_attn_weights = self.attention(lstm_weight, lstm_out) # new_hidden: 128, 64
    
        # print (lstm_out.size())
         
@@ -147,7 +127,7 @@ class highwayNet(nn.Module):
         #print (nbrs_out.size())
         nbrs_lstm_weight = self.pre4att(self.tanh(nbrs_out)) # 128, 16, 1
        # print (lstm_weight.size())
-        new_nbrs_hidden, soft_nbrs_attn_weights = self.attention_1(nbrs_lstm_weight, nbrs_out) # new_hidden: 128, 64
+        new_nbrs_hidden, soft_nbrs_attn_weights = self.attention(nbrs_lstm_weight, nbrs_out) # new_hidden: 128, 64
         nbrs_enc = new_nbrs_hidden
         # end: apply attention mechanism to neighbors
         
@@ -167,49 +147,29 @@ class highwayNet(nn.Module):
         # copy nbrs_enc values sequentially to soc_enc where masks is 1
         soc_enc = soc_enc.permute(0,3,2,1) # soc_enc size: (128, 64, 13, 3)
         soc_enc = soc_enc.contiguous().view(soc_enc.shape[0], soc_enc.shape[1], -1)
-        # print (soc_enc.size()) 128, 64, 39
+        # print (soc_enc.size()) 128, 64, 39 
 
         # concatenate hidden states:
         new_hs = torch.cat((soc_enc, new_hidden), 2)
         #print (new_hs.size()) # 128, 64, 40
-        new_hs_per = new_hs.permute(0, 2, 1)
+        new_hs_per = new_hs.permute(0, 2, 1) # 128, 40, 64
         
         # second attention
-        weight = self.pre4att(self.tanh(new_hs_per)) # 128, 16, 1
+        weight = self.pre4att(self.tanh(new_hs_per)) # 128,  40, 64
         #print (weight.size()) 128, 40, 1
-        new_hidden_ha, soft_attn_weights_ha = self.attention_1(weight, new_hs_per) # new_hidden: 128, 64
+        new_hidden_ha, soft_attn_weights_ha = self.attention(weight, new_hs_per) # new_hidden: 128, 64
         #print (new_hidden_ha.size()) 128, 64
         ## Concatenate encodings:
         enc = new_hidden_ha #new_hidden.view(new_hidden.shape[1],new_hidden.shape[2])#torch.cat((soc_enc,hist_enc),1) # (128, 112)
         #print (enc.size())
 
 
-        if self.use_maneuvers:
-            ## Maneuver recognition:
-            lat_pred = self.softmax(self.op_lat(enc)) # calculate probability of lateral movement
-            lon_pred = self.softmax(self.op_lon(enc)) # calculate probability of longtudinal movement
 
-            if self.train_flag:
-                ## Concatenate maneuver encoding of the true maneuver
-                enc = torch.cat((enc, lat_enc, lon_enc), 1)  #(128, 117) 80 + 32 + 3 + 2 = 117 # lat_enc historical lateral movement information 128 by 3; lon_enc historical longitunal movement information
-                #print (enc.size())
-                fut_pred = self.decode(enc)
-                return fut_pred, lat_pred, lon_pred
-            else:
-                fut_pred = []
-                ## Predict trajectory distributions for each maneuver class
-                for k in range(self.num_lon_classes):
-                    for l in range(self.num_lat_classes):
-                        lat_enc_tmp = torch.zeros_like(lat_enc) 
-                        lon_enc_tmp = torch.zeros_like(lon_enc)
-                        lat_enc_tmp[:, l] = 1
-                        lon_enc_tmp[:, k] = 1
-                        enc_tmp = torch.cat((enc, lat_enc_tmp, lon_enc_tmp), 1)
-                        fut_pred.append(self.decode(enc_tmp)) # get six possible trajectories
-                return fut_pred, lat_pred, lon_pred
-        else:
-            fut_pred = self.decode_by_step(enc) 
-            return fut_pred, soft_attn_weights, soft_nbrs_attn_weights, soft_attn_weights_ha
+        fut_pred = self.decode_by_step(enc) 
+        return fut_pred, soft_attn_weights, soft_nbrs_attn_weights, soft_attn_weights_ha
+
+# soft_attn_weights and soft_nbrs_attn_weights are the attention weights across time steps (the ego-vehicle and neighbors)
+# soft_attn_weights_ha are the attention weights across vehicles (13 by 3 neighbors, row-wise flattern, [[1, 2, 3], [4, 5, 6], ...[X, X, X]], the 40th is the ego vehicle)
 
 
     def decode(self,enc):
