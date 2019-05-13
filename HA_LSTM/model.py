@@ -103,7 +103,7 @@ class highwayNet(nn.Module):
     
     ## Forward Pass
     def forward(self,hist,nbrs,masks,lat_enc,lon_enc):
-        #print (hist.size())16, 128, 64
+        #print (hist.size())16, 128, 2
         ## Forward pass hist:
         lstm_out,(hist_enc,_) = self.enc_lstm1(self.leaky_relu(self.ip_emb(hist)))
         #print (lstm_out.size()) # (16, 128, 64) (seq_len, batch_size, hidden_state_size)
@@ -165,7 +165,7 @@ class highwayNet(nn.Module):
 
 
 
-        fut_pred = self.decode_by_step(enc) 
+        fut_pred = self.decode(enc) 
         return fut_pred, soft_attn_weights, soft_nbrs_attn_weights, soft_attn_weights_ha
 
 # soft_attn_weights and soft_nbrs_attn_weights are the attention weights across time steps (the ego-vehicle and neighbors)

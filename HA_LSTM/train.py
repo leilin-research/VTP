@@ -5,26 +5,27 @@ from utils import ngsimDataset,maskedNLL,maskedMSE,maskedNLLTest
 from torch.utils.data import DataLoader
 import time
 import math
-
+import datetime
 
 ## Network Arguments
 args = {}
 args['use_cuda'] = True
-args['encoder_size'] = 64
-args['decoder_size'] = 128
+args['encoder_size'] = 64 # lstm encoder hidden state size, adjustable
+args['decoder_size'] = 128 # lstm decoder  hidden state size, adjustable
 args['in_length'] = 16
 args['out_length'] = 5
 args['grid_size'] = (13,3)
-args['soc_conv_depth'] = 64
-args['conv_3x1_depth'] = 16
-args['dyn_embedding_size'] = 32
-args['input_embedding_size'] = 32
+args['soc_conv_depth'] = 64 # social pooling stuff
+args['conv_3x1_depth'] = 16 # social pooling stuff
+args['dyn_embedding_size'] = 32 # maneuver stuff
+args['input_embedding_size'] = 32 # input dimension for lstm encoder, adjustable
 args['num_lat_classes'] = 3
 args['num_lon_classes'] = 2
 args['use_maneuvers'] = False
 args['train_flag'] = True
 
 
+start_time = datetime.datetime.now()
 
 # Initialize network
 net = highwayNet(args)
@@ -33,9 +34,9 @@ if args['use_cuda']:
 
 
 ## Initialize optimizer
-pretrainEpochs = 0 #5
+pretrainEpochs = 0
 trainEpochs = 10
-optimizer = torch.optim.Adam(net.parameters())
+optimizer = torch.optim.Adam(net.parameters()) #lr = ...
 batch_size = 128
 crossEnt = torch.nn.BCELoss() # binary cross entropy
 
@@ -107,7 +108,7 @@ for epoch_num in range(pretrainEpochs+trainEpochs):
         l.backward()
         a = torch.nn.utils.clip_grad_norm_(net.parameters(), 10)
         optimizer.step()
-
+        #optimizer = tf.train.RMSPropOptimizer(learning_rate, decay).minimize(cost)
         # Track average train loss and average train time:
         batch_time = time.time()-st_time
         avg_tr_loss += l.item() # sum mse for 100 batches
@@ -182,10 +183,12 @@ for epoch_num in range(pretrainEpochs+trainEpochs):
 
 
 
+end_time = datetime.datetime.now()
 
+print('Total training time: ', end_time-start_time)
     #__________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
 
-torch.save(net.state_dict(), 'trained_models/ha_lstm_m_by_step.tar')
+torch.save(net.state_dict(), 'trained_models/ha_lstm_05122019.tar')
 
 
 
