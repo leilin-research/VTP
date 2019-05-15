@@ -37,7 +37,7 @@ if args['use_cuda']:
 pretrainEpochs = 0
 trainEpochs = 10
 optimizer = torch.optim.Adam(net.parameters()) #lr = ...
-batch_size = 256 #128
+batch_size = 128
 crossEnt = torch.nn.BCELoss() # binary cross entropy
 
 
