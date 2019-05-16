@@ -53,7 +53,8 @@ dsID = []
 ts_cen = []
 ts_nbr = []
 wt_ha = []
-
+nbr_location = []
+print (len(tsDataloader.dataset) / 128)
 for i, data in enumerate(tsDataloader):
     st_time = time.time()
     hist, nbrs, mask, lat_enc, lon_enc, fut, op_mask, veh_id, t, ds = data
@@ -61,7 +62,8 @@ for i, data in enumerate(tsDataloader):
     #print (veh_id.size())
     T.append(t) # current time
     dsID.append(ds)
-
+    
+    print (i)
     # Initialize Variables
     if args['use_cuda']:
         hist = hist.cuda()
@@ -81,19 +83,9 @@ for i, data in enumerate(tsDataloader):
             fut_pred = net(hist, nbrs, mask, lat_enc, lon_enc)
             l, c = maskedNLLTest(fut_pred, 0, 0, fut, op_mask,use_maneuvers=False)
     else:
-        # Forward pass
-        if args['use_maneuvers']:
-            fut_pred, lat_pred, lon_pred = net(hist, nbrs, mask, lat_enc, lon_enc)
-            fut_pred_max = torch.zeros_like(fut_pred[0])
-            for k in range(lat_pred.shape[0]):
-                lat_man = torch.argmax(lat_pred[k, :]).detach()
-                lon_man = torch.argmax(lon_pred[k, :]).detach()
-                indx = lon_man*3 + lat_man
-                fut_pred_max[:,k,:] = fut_pred[indx][:,k,:]
-            l, c = maskedMSETest(fut_pred_max, fut, op_mask)
-        else:
-            fut_pred, weight_ts_center, weight_ts_nbr, weight_ha = net(hist, nbrs, mask, lat_enc, lon_enc)
-            l, c = maskedMSETest(fut_pred, fut, op_mask)
+
+        fut_pred, weight_ts_center, weight_ts_nbr, weight_ha, nbr_loc= net(hist, nbrs, mask, lat_enc, lon_enc)
+        l, c = maskedMSETest(fut_pred, fut, op_mask)
 
     fut_pred_x = fut_pred[:,:,0].detach()
     fut_pred_x = fut_pred_x.cpu().numpy()
@@ -107,6 +99,8 @@ for i, data in enumerate(tsDataloader):
     ts_cen.append(weight_ts_center[:, :, 0].detach().cpu().numpy())
     ts_nbr.append(weight_ts_nbr[:, :, 0].detach().cpu().numpy())
     wt_ha.append(weight_ha[:, :, 0].detach().cpu().numpy())
+    #print (nbr_loc)
+    nbr_location.append(np.array(nbr_loc))
 
     #print (len(pred))
     lossVal +=l.detach() # revised by Lei
@@ -137,6 +131,8 @@ ts_nbr = pd.DataFrame(ts_nbr)
 wt_ha = np.concatenate( wt_ha, axis=0)
 wt_ha = pd.DataFrame(wt_ha)
 
+
+
 vehid.to_csv('/home/lei/workspace/data/trajectory/vehid.csv')
 T.to_csv('/home/lei/workspace/data/trajectory/T.csv')
 dsID.to_csv('/home/lei/workspace/data/trajectory/dsID.csv')
@@ -145,6 +141,10 @@ pred_y.to_csv('/home/lei/workspace/data/trajectory/pred_y.csv')
 ts_cen.to_csv('/home/lei/workspace/data/trajectory/ts_cen.csv')
 ts_nbr.to_csv('/home/lei/workspace/data/trajectory/ts_nbr.csv')
 wt_ha.to_csv('/home/lei/workspace/data/trajectory/wt_ha.csv')
+
+nbr_location = np.concatenate( nbr_location, axis=0)
+nbr_location = pd.DataFrame(nbr_location)
+nbr_location.to_csv('/home/lei/workspace/data/trajectory/nbr_location.csv')
 
 print ('lossVal is:', lossVal)
 if metric == 'nll':

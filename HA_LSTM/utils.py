@@ -39,7 +39,7 @@ class ngsimDataset(Dataset):
         fut = self.getFuture(vehId,t,dsId) # future of the target vehicle
 
         # Get track histories of all neighbours 'neighbors' = [ndarray,[],ndarray,ndarray]
-        for i in grid:
+        for i in grid: # neighbors found from data preprocessing
             neighbors.append(self.getHistory(i.astype(int), t,vehId,dsId)) # history of neighbor vehicles
 
         # Maneuvers 'lon_enc' = one-hot vector, 'lat_enc = one-hot vector
