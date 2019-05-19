@@ -38,7 +38,7 @@ if args['use_cuda']:
     net = net.cuda()
 
 tsSet = ngsimDataset('/home/lei/workspace/data/trajectory/TestSet.mat')
-tsDataloader = DataLoader(tsSet,batch_size=128,shuffle=True,num_workers=8,collate_fn=tsSet.collate_fn) # 
+tsDataloader = DataLoader(tsSet,batch_size=128,shuffle=False,num_workers=8,collate_fn=tsSet.collate_fn) # 
 
 lossVals = torch.zeros(25).cuda()
 counts = torch.zeros(25).cuda()
