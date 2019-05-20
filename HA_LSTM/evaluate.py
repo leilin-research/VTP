@@ -58,53 +58,57 @@ print (len(tsDataloader.dataset) / 128)
 for i, data in enumerate(tsDataloader):
     st_time = time.time()
     hist, nbrs, mask, lat_enc, lon_enc, fut, op_mask, veh_id, t, ds = data
-    vehid.append(veh_id) # current vehicle to predict
+    #if i == 2174:
+    #    print (isinstance(hist, list))
+    #a = list(hist.size()) # [16, 128, 2] if it is normal
+    if not isinstance(hist, list): # nbrs are not zeros
+        vehid.append(veh_id) # current vehicle to predict
     #print (veh_id.size())
-    T.append(t) # current time
-    dsID.append(ds)
+        T.append(t) # current time
+        dsID.append(ds)
     
-    print (i)
+        print (i)
     # Initialize Variables
-    if args['use_cuda']:
-        hist = hist.cuda()
-        nbrs = nbrs.cuda()
-        mask = mask.cuda()
-        lat_enc = lat_enc.cuda()
-        lon_enc = lon_enc.cuda()
-        fut = fut.cuda()
-        op_mask = op_mask.cuda()
+        if args['use_cuda']:
+            hist = hist.cuda()
+            nbrs = nbrs.cuda()
+            mask = mask.cuda()
+            lat_enc = lat_enc.cuda()
+            lon_enc = lon_enc.cuda()
+            fut = fut.cuda()
+            op_mask = op_mask.cuda()
 
-    if metric == 'nll':
+        if metric == 'nll':
         # Forward pass
-        if args['use_maneuvers']:
-            fut_pred, lat_pred, lon_pred = net(hist, nbrs, mask, lat_enc, lon_enc)
-            l,c = maskedNLLTest(fut_pred, lat_pred, lon_pred, fut, op_mask, avg_along_time = True) # take average or not by Lei
+            if args['use_maneuvers']:
+                fut_pred, lat_pred, lon_pred = net(hist, nbrs, mask, lat_enc, lon_enc)
+                l,c = maskedNLLTest(fut_pred, lat_pred, lon_pred, fut, op_mask, avg_along_time = True) # take average or not by Lei
+            else:
+                fut_pred = net(hist, nbrs, mask, lat_enc, lon_enc)
+                l, c = maskedNLLTest(fut_pred, 0, 0, fut, op_mask,use_maneuvers=False)
         else:
-            fut_pred = net(hist, nbrs, mask, lat_enc, lon_enc)
-            l, c = maskedNLLTest(fut_pred, 0, 0, fut, op_mask,use_maneuvers=False)
-    else:
 
-        fut_pred, weight_ts_center, weight_ts_nbr, weight_ha, nbr_loc= net(hist, nbrs, mask, lat_enc, lon_enc)
-        l, c = maskedMSETest(fut_pred, fut, op_mask)
+            fut_pred, weight_ts_center, weight_ts_nbr, weight_ha, nbr_loc= net(hist, nbrs, mask, lat_enc, lon_enc)
+            l, c = maskedMSETest(fut_pred, fut, op_mask)
 
-    fut_pred_x = fut_pred[:,:,0].detach()
-    fut_pred_x = fut_pred_x.cpu().numpy()
-    #print (type(fut_pred_x)) # (25, 128)
-    fut_pred_y = fut_pred[:,:,1].detach()
-    fut_pred_y = fut_pred_y.cpu().numpy()
-    pred_x.append(fut_pred_x)
-    pred_y.append(fut_pred_y)
+        fut_pred_x = fut_pred[:,:,0].detach()
+        fut_pred_x = fut_pred_x.cpu().numpy()
+        #print (type(fut_pred_x)) # (25, 128)
+        fut_pred_y = fut_pred[:,:,1].detach()
+        fut_pred_y = fut_pred_y.cpu().numpy()
+        pred_x.append(fut_pred_x)
+        pred_y.append(fut_pred_y)
 
-    #print (weight_ha.size())
-    ts_cen.append(weight_ts_center[:, :, 0].detach().cpu().numpy())
-    ts_nbr.append(weight_ts_nbr[:, :, 0].detach().cpu().numpy())
-    wt_ha.append(weight_ha[:, :, 0].detach().cpu().numpy())
+        #print (weight_ha.size())
+        ts_cen.append(weight_ts_center[:, :, 0].detach().cpu().numpy())
+        ts_nbr.append(weight_ts_nbr[:, :, 0].detach().cpu().numpy())
+        wt_ha.append(weight_ha[:, :, 0].detach().cpu().numpy())
     #print (nbr_loc)
-    nbr_location.append(np.array(nbr_loc))
+        nbr_location.append(np.array(nbr_loc))
 
     #print (len(pred))
-    lossVal +=l.detach() # revised by Lei
-    count += c.detach()
+        lossVal +=l.detach() # revised by Lei
+        count += c.detach()
 
 vehid = sum(vehid, [])
 vehid = pd.DataFrame(vehid)

@@ -98,58 +98,62 @@ class ngsimDataset(Dataset):
         for _,_,nbrs,_,_,_,_,_ in samples:
             nbr_batch_size += sum([len(nbrs[i])!=0 for i in range(len(nbrs))]) # pick neighbors that are not zeros
         maxlen = self.t_h//self.d_s + 1
-        nbrs_batch = torch.zeros(maxlen,nbr_batch_size,2)
+        #print ('nbr_batch_size is ', nbr_batch_size)
+        if nbr_batch_size != 0:
+            nbrs_batch = torch.zeros(maxlen,nbr_batch_size,2)
+
+        
+            # Initialize social mask batch:
+            pos = [0, 0]
+            mask_batch = torch.zeros(len(samples), self.grid_size[1],self.grid_size[0],self.enc_size) # gird_size (13, 3) width 3, height 13, depth lenth of output of lstm cells
+            mask_batch = mask_batch.byte() # self.to(torch.uint8)
 
 
-        # Initialize social mask batch:
-        pos = [0, 0]
-        mask_batch = torch.zeros(len(samples), self.grid_size[1],self.grid_size[0],self.enc_size) # gird_size (13, 3) width 3, height 13, depth lenth of output of lstm cells
-        mask_batch = mask_batch.byte() # self.to(torch.uint8)
+            # Initialize history, history lengths, future, output mask, lateral maneuver and longitudinal maneuver batches:
+            hist_batch = torch.zeros(maxlen,len(samples),2)
+            fut_batch = torch.zeros(self.t_f//self.d_s,len(samples),2)
+            op_mask_batch = torch.zeros(self.t_f//self.d_s,len(samples),2) # future timestep, number of vehs, two locations x and y
+            lat_enc_batch = torch.zeros(len(samples),3)
+            lon_enc_batch = torch.zeros(len(samples), 2)
 
 
-        # Initialize history, history lengths, future, output mask, lateral maneuver and longitudinal maneuver batches:
-        hist_batch = torch.zeros(maxlen,len(samples),2)
-        fut_batch = torch.zeros(self.t_f//self.d_s,len(samples),2)
-        op_mask_batch = torch.zeros(self.t_f//self.d_s,len(samples),2) # future timestep, number of vehs, two locations x and y
-        lat_enc_batch = torch.zeros(len(samples),3)
-        lon_enc_batch = torch.zeros(len(samples), 2)
-
-
-        count = 0
-        veh_ID = []
-        time = []
-        dsID = []
-        for sampleId,(hist, fut, nbrs, lat_enc, lon_enc, vehId, t, ds) in enumerate(samples):
+            count = 0
+            veh_ID = []
+            time = []
+            dsID = []
+            for sampleId,(hist, fut, nbrs, lat_enc, lon_enc, vehId, t, ds) in enumerate(samples):
             #print ('sampleId is: ', sampleId)
 	    # Set up history, future, lateral maneuver and longitudinal maneuver batches:
-            hist_batch[0:len(hist),sampleId,0] = torch.from_numpy(hist[:, 0]) # NOTE here it is [0:len(hist), ...] not maxlen
-            hist_batch[0:len(hist), sampleId, 1] = torch.from_numpy(hist[:, 1])
-            fut_batch[0:len(fut), sampleId, 0] = torch.from_numpy(fut[:, 0])
-            fut_batch[0:len(fut), sampleId, 1] = torch.from_numpy(fut[:, 1])
-            op_mask_batch[0:len(fut),sampleId,:] = 1 # SIMILAR, here it is len(fut), not self.t_f//self.d_s
-            lat_enc_batch[sampleId,:] = torch.from_numpy(lat_enc)
-            lon_enc_batch[sampleId, :] = torch.from_numpy(lon_enc)
-            veh_ID.append(vehId)
-            time.append(t)
-            dsID.append(ds)
+                hist_batch[0:len(hist),sampleId,0] = torch.from_numpy(hist[:, 0]) # NOTE here it is [0:len(hist), ...] not maxlen
+                hist_batch[0:len(hist), sampleId, 1] = torch.from_numpy(hist[:, 1])
+                fut_batch[0:len(fut), sampleId, 0] = torch.from_numpy(fut[:, 0])
+                fut_batch[0:len(fut), sampleId, 1] = torch.from_numpy(fut[:, 1])
+                op_mask_batch[0:len(fut),sampleId,:] = 1 # SIMILAR, here it is len(fut), not self.t_f//self.d_s
+                lat_enc_batch[sampleId,:] = torch.from_numpy(lat_enc)
+                lon_enc_batch[sampleId, :] = torch.from_numpy(lon_enc)
+                veh_ID.append(vehId)
+                time.append(t)
+                dsID.append(ds)
 
             # Set up neighbor, neighbor sequence length, and mask batches:
-            for id,nbr in enumerate(nbrs):
-                if len(nbr)!=0: # recall that in getHistory(), if there is no neighbor, it returns an empty array [0, 2], the length of which is 0
+                for id,nbr in enumerate(nbrs):
+                    if len(nbr)!=0: # recall that in getHistory(), if there is no neighbor, it returns an empty array [0, 2], the length of which is 0
                     #print ('count is: ', count)
-                    nbrs_batch[0:len(nbr),count,0] = torch.from_numpy(nbr[:, 0])
-                    nbrs_batch[0:len(nbr), count, 1] = torch.from_numpy(nbr[:, 1])
+                        nbrs_batch[0:len(nbr),count,0] = torch.from_numpy(nbr[:, 0])
+                        nbrs_batch[0:len(nbr), count, 1] = torch.from_numpy(nbr[:, 1])
 		    # id is from 0-38, because each nbrs is a list of length 39, if there is neighbor, there is values, otherwist it is appended [0, 0]
-                    pos[0] = id % self.grid_size[0] # qu yu
-                    pos[1] = id // self.grid_size[0] # qu zheng, self.grid_size[0] is 13; < 13, pos[1] = 0, left; =13, pos[1] = 1, middle;
+                        pos[0] = id % self.grid_size[0] # qu yu
+                        pos[1] = id // self.grid_size[0] # qu zheng, self.grid_size[0] is 13; < 13, pos[1] = 0, left; =13, pos[1] = 1, middle;
                     #print ('id is ', id)
                     #print ('self.grid_size[0] is ', self.grid_size[0])
                     #print ('pos[0] is ', pos[0])
                     #print ('pos[1] is ', pos[1])
-                    mask_batch[sampleId,pos[1],pos[0],:] = torch.ones(self.enc_size).byte()
-                    count+=1 # is it useful here?
+                        mask_batch[sampleId,pos[1],pos[0],:] = torch.ones(self.enc_size).byte()
+                        count+=1 # is it useful here?
 
-        return hist_batch, nbrs_batch, mask_batch, lat_enc_batch, lon_enc_batch, fut_batch, op_mask_batch, veh_ID, time, dsID #output mask
+            return hist_batch, nbrs_batch, mask_batch, lat_enc_batch, lon_enc_batch, fut_batch, op_mask_batch, veh_ID, time, dsID #output mask
+        else:
+            return [-1], -1, -1, -1, -1, -1, -1, -1, -1, -1
 
 #________________________________________________________________________________________________________________________________________
 
