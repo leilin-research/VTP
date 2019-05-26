@@ -10,7 +10,7 @@ code of hieratical-attention LSTM for vehicle trajectory prediction (time-step l
 # Data:
 NGSIM data - the same processing procedure from the convolutional social pooling paper is followed. The training/val/testing datasets can be dowloaed from [here](https://drive.google.com/open?id=1dFMpX8HeCradMaCh4h0bD60h8k3M65Fw).
 
-# 5-step MSE:
+# 5-step RMSE:
 
 Conv_social: [0.1011, 0.1976, 0.3109, 0.4324, 0.5599] training time: 3.30 hours
 
