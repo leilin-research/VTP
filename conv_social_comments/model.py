@@ -80,7 +80,7 @@ class highwayNet(nn.Module):
         hist_enc = self.leaky_relu(self.dyn_emb(hist_enc.view(hist_enc.shape[1],hist_enc.shape[2]))) # dyn_emb a feedforward network
 
         ## Forward pass nbrs
-        print ('neighbor size is ', nbrs.size()) # example (16, 991, 2), 16 (history 30/ downsample 2), 991-all the number of neighbors in the past 30 time steps, 2-x and y locations
+        #print ('neighbor size is ', nbrs.size()) # example (16, 991, 2), 16 (history 30/ downsample 2), 991-all the number of neighbors in the past 30 time steps, 2-x and y locations
         _, (nbrs_enc,_) = self.enc_lstm(self.leaky_relu(self.ip_emb(nbrs)))
         #print ('before', nbrs_enc.size()) # example (1, 991, 64), 16 will be the timesteps in LSTM; 1 is because the output is from the last LSTM cell; 991 number of neighbors, 2-x and y locations
         nbrs_enc = nbrs_enc.view(nbrs_enc.shape[1], nbrs_enc.shape[2]) # squeeze the dimision 0, now becomes (991, 64)

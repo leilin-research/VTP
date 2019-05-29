@@ -13,7 +13,7 @@ args['use_cuda'] = True
 args['encoder_size'] = 64
 args['decoder_size'] = 128
 args['in_length'] = 16
-args['out_length'] = 25
+args['out_length'] = 5
 args['grid_size'] = (13,3)
 args['soc_conv_depth'] = 64
 args['conv_3x1_depth'] = 16
@@ -33,8 +33,8 @@ if args['use_cuda']:
 
 
 ## Initialize optimizer
-pretrainEpochs = 0 #5
-trainEpochs = 3
+pretrainEpochs = 0
+trainEpochs = 10
 optimizer = torch.optim.Adam(net.parameters())
 batch_size = 128
 crossEnt = torch.nn.BCELoss() # binary cross entropy
@@ -100,7 +100,7 @@ for epoch_num in range(pretrainEpochs+trainEpochs):
             if epoch_num < pretrainEpochs:
                 l = maskedMSE(fut_pred, fut, op_mask)
             else:
-                l = maskedNLL(fut_pred, fut, op_mask)
+                l = maskedMSE(fut_pred, fut, op_mask) # train with maskedMSE
 
         # Backprop and update weights
         optimizer.zero_grad()
@@ -168,7 +168,7 @@ for epoch_num in range(pretrainEpochs+trainEpochs):
             if epoch_num < pretrainEpochs:
                 l = maskedMSE(fut_pred, fut, op_mask)
             else:
-                l = maskedNLL(fut_pred, fut, op_mask)
+                l = maskedMSE(fut_pred, fut, op_mask)
 
         avg_val_loss += l.item()
         val_batch_count += 1

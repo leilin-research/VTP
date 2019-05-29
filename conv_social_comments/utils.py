@@ -10,7 +10,7 @@ import torch
 class ngsimDataset(Dataset):
 
 
-    def __init__(self, mat_file, t_h=30, t_f=50, d_s=2, enc_size = 64, grid_size = (13,3)):
+    def __init__(self, mat_file, t_h=30, t_f=10, d_s=2, enc_size = 64, grid_size = (13,3)):
         self.D = scp.loadmat(mat_file)['traj']
         self.T = scp.loadmat(mat_file)['tracks']
         self.t_h = t_h  # length of track history
@@ -174,7 +174,7 @@ def maskedNLL(y_pred, y_gt, mask):
     y = y_gt[:,:, 1]
     out = torch.pow(ohr, 2)*(torch.pow(sigX, 2)*torch.pow(x-muX, 2) + torch.pow(sigY, 2)*torch.pow(y-muY, 2) - 2*rho*torch.pow(sigX, 1)*torch.pow(sigY, 1)*(x-muX)*(y-muY)) - torch.log(sigX*sigY*ohr)
     # this is "negative log-likelihood of bivariate gaussian model"
-    print ('out is ', out.size())
+    # print ('out is ', out.size())
     acc[:,:,0] = out # size (25, 128)
     acc[:,:,1] = out # later use sum(mask) and take the average will make this correct
     acc = acc*mask
@@ -253,6 +253,7 @@ def maskedMSE(y_pred, y_gt, mask):
 
 ## MSE loss for complete sequence, outputs a sequence of MSE values, uses mask for variable output lengths, used for evaluation
 def maskedMSETest(y_pred, y_gt, mask):
+    print (mask.size())
     acc = torch.zeros_like(mask)
     muX = y_pred[:, :, 0]
     muY = y_pred[:, :, 1]
@@ -264,6 +265,7 @@ def maskedMSETest(y_pred, y_gt, mask):
     acc = acc * mask
     lossVal = torch.sum(acc[:,:,0],dim=1)
     counts = torch.sum(mask[:,:,0],dim=1)
+
     return lossVal, counts
 
 ## Helper function for log sum exp calculation:
