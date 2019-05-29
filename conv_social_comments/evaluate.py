@@ -13,7 +13,7 @@ args['use_cuda'] = True
 args['encoder_size'] = 64
 args['decoder_size'] = 128
 args['in_length'] = 16
-args['out_length'] = 25
+args['out_length'] = 5
 args['grid_size'] = (13,3)
 args['soc_conv_depth'] = 64
 args['conv_3x1_depth'] = 16
@@ -21,13 +21,13 @@ args['dyn_embedding_size'] = 32
 args['input_embedding_size'] = 32
 args['num_lat_classes'] = 3
 args['num_lon_classes'] = 2
-args['use_maneuvers'] = True
+args['use_maneuvers'] = False
 args['train_flag'] = False
 
 
 # Evaluation metric:
-metric = 'nll'  #or rmse
-# metric = 'rmse'
+#metric = 'nll'  #or rmse
+metric = 'rmse'
 
 # Initialize network
 net = highwayNet(args)
@@ -38,14 +38,15 @@ if args['use_cuda']:
 tsSet = ngsimDataset('/home/lei/workspace/data/trajectory/TestSet.mat')
 tsDataloader = DataLoader(tsSet,batch_size=128,shuffle=True,num_workers=8,collate_fn=tsSet.collate_fn)
 
-lossVals = torch.zeros(25).cuda()
-counts = torch.zeros(25).cuda()
+lossVals = torch.zeros(5).cuda()
+counts = torch.zeros(5).cuda()
 lossVal = 0 # revised by Lei
 count = 0
 
 for i, data in enumerate(tsDataloader):
     st_time = time.time()
     hist, nbrs, mask, lat_enc, lon_enc, fut, op_mask = data
+    #print (op_mask.size())
 
     # Initialize Variables
     if args['use_cuda']:
@@ -85,6 +86,8 @@ for i, data in enumerate(tsDataloader):
     count += c.detach()
 
 print ('lossVal is:', lossVal)
+print ('count is:', count)
+
 if metric == 'nll':
     print(lossVal / count)
 else:
