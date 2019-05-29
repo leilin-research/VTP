@@ -12,7 +12,7 @@ NGSIM data - the same processing procedure from the convolutional social pooling
 
 # 5-step RMSE:
 
-Conv_social: [0.1011, 0.1976, 0.3109, 0.4324, 0.5599] training time: 3.30 hours
+Conv_social: [0.1029, 0.2023, 0.3146, 0.4364, 0.5674] training time: 3.30 hours
 
 HA-LSTM: [0.0995, 0.2002, 0.3130, 0.4348, 0.5615]
 
