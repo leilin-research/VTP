@@ -40,8 +40,8 @@ if args['use_cuda']:
 tsSet = ngsimDataset('/home/lei/workspace/data/trajectory/TestSet.mat')
 tsDataloader = DataLoader(tsSet,batch_size=128,shuffle=True,num_workers=8,collate_fn=tsSet.collate_fn) # 
 
-lossVals = torch.zeros(25).cuda()
-counts = torch.zeros(25).cuda()
+lossVals = torch.zeros(5).cuda()
+counts = torch.zeros(5).cuda()
 lossVal = 0 # revised by Lei
 count = 0
 
@@ -67,7 +67,7 @@ for i, data in enumerate(tsDataloader):
         T.append(t) # current time
         dsID.append(ds)
     
-        print (i)
+        #print (i)
     # Initialize Variables
         if args['use_cuda']:
             hist = hist.cuda()
