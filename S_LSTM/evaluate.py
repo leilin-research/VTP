@@ -33,7 +33,7 @@ metric = 'rmse'
 
 # Initialize network
 net = highwayNet(args)
-net.load_state_dict(torch.load('trained_models/ha_lstm_05302019.tar'))
+net.load_state_dict(torch.load('trained_models/ha_lstm_05312019.tar'))
 if args['use_cuda']:
     net = net.cuda()
 
