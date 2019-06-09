@@ -88,7 +88,7 @@ for i, data in enumerate(tsDataloader):
                 l, c = maskedNLLTest(fut_pred, 0, 0, fut, op_mask,use_maneuvers=False)
         else:
 
-            fut_pred, weight_ts_center, weight_ts_nbr, weight_ha, nbr_loc= net(hist, nbrs, mask, lat_enc, lon_enc)
+            fut_pred, weight_ts_center, weight_ts_nbr, weight_ha= net(hist, nbrs, mask, lat_enc, lon_enc)
             l, c = maskedMSETest(fut_pred, fut, op_mask)
 
         fut_pred_x = fut_pred[:,:,0].detach()

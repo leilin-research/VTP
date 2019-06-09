@@ -147,20 +147,20 @@ class highwayNet(nn.Module):
         # copy nbrs_enc values sequentially to soc_enc where masks is 1
         masks_tem = masks.permute(0, 3, 2, 1)
         #print (masks_tem.size()[0])
-        nbr_loc = [] # [left, middle, right] by 13 (from the back to the front)
-        for k in range(masks_tem.size()[0]): # for each batch
-            tem = []
+        #nbr_loc = [] # [left, middle, right] by 13 (from the back to the front)
+        #for k in range(masks_tem.size()[0]): # for each batch
+        #    tem = []
             #print (k)
-            for i in range(masks_tem.size()[2]): # for each in 13 (from back to the front)
-                for j in range(masks_tem.size()[3]): # for each in 3 (from left to right)
+        #    for i in range(masks_tem.size()[2]): # for each in 13 (from back to the front)
+        #        for j in range(masks_tem.size()[3]): # for each in 3 (from left to right)
                     
                     #print (j)
                     #print (i)
-                    if masks_tem[k, 0, i, j] != 0:
-                        tem.append(1)
-                    else:
-                        tem.append(0)
-            nbr_loc.append(tem)
+        #            if masks_tem[k, 0, i, j] != 0:
+        #                tem.append(1)
+        #            else:
+        #                tem.append(0)
+        #    nbr_loc.append(tem)
         soc_enc = soc_enc.permute(0,3,2,1) # soc_enc size: (128, 64, 13, 3)
         soc_enc = soc_enc.contiguous().view(soc_enc.shape[0], soc_enc.shape[1], -1) #128, 64, 39
         # print (soc_enc.size()) 128, 64, 39 
@@ -182,7 +182,7 @@ class highwayNet(nn.Module):
 
 
         fut_pred = self.decode(enc) 
-        return fut_pred, soft_attn_weights, soft_nbrs_attn_weights, soft_attn_weights_ha, nbr_loc
+        return fut_pred, soft_attn_weights, soft_nbrs_attn_weights, soft_attn_weights_ha#, nbr_loc
 
 # soft_attn_weights and soft_nbrs_attn_weights are the attention weights across time steps (the ego-vehicle and neighbors)
 # soft_attn_weights_ha are the attention weights across vehicles (13 by 3 neighbors, row-wise flattern, [[1, 2, 3], [4, 5, 6], ...[X, X, X]], the 40th is the ego vehicle)
