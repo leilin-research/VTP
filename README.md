@@ -6,21 +6,11 @@ Vehicle Trajectory Prediction with Deep Learning Models
 STA-LSTM achieves comparable prediction performance against other state-of-the-art models (e.g., conv-LSTM [1], naive LSTM), and also explains the influence of historical trajectories and neighboring vehicles on the target vehicle.
 
 
-| Models      |          RMSE per prediction time step           ||
-              | 1 | 2 | 3 | 4 | 5 | 
- ------------ | :-----------: | -----------: |:-----------: | -----------: |:-----------: |
-physics-based model|  0.1776     |   0.3852     |    0.6033    |    0.8377    |    1.0888    |
-naive LSTM |       |        |        |        |        |
-SA-LSTM   |       |        |        |        |        |
-CS-LSTM [1] |       |        |        |        |        |
-STA-LSTM |      |        |        |        |        || 
-
-
 <table>
 <tr>
-<td colspan=1>Models <td colspan=5>RMSE per prediction time step
+<td rowspan=2>Models <td colspan=5>RMSE per prediction time step
 <tr>
-<td colspan=1> <td colspan=1>1 <td colspan=1>2<td colspan=1>3 <td colspan=1>4 <td colspan=1>5
+<td colspan=1>1 <td colspan=1>2<td colspan=1>3 <td colspan=1>4 <td colspan=1>5
 <tr>
 <td colspan=1>physics-based model <td colspan=1>0.1776 <td colspan=1>0.3852 <td colspan=1>0.6033 <td colspan=1>0.8377 <td colspan=1>1.0888
 <tr>
