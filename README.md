@@ -1,9 +1,14 @@
-# VTP
-Vehicle Trajectory Prediction with Deep Learning Models
+# VTP: Vehicle Trajectory Prediction with Deep Learning Models
 
 
 ## STA-LSTM: An LSTM model with spatial-temporal attention mechanisms
-STA-LSTM achieves comparable prediction performance against other state-of-the-art models (e.g., conv-LSTM [1], naive LSTM), and also explains the influence of historical trajectories and neighboring vehicles on the target vehicle.
+STA-LSTM utilizes T-step historical trajectories of all vehicles within a 3×13 grid centered around the target vehicle to predict its future trajectories. The architecture of STA-LSTM is shown below:
+
+<p float="left">
+  <img src="images/sta_lstm.png" width="750" height="250" />
+</p>
+
+STA-LSTM achieves comparable prediction performance against other state-of-the-art models. 
 
 
 <table>
