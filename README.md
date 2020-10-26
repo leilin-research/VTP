@@ -62,7 +62,7 @@ The training/val/testing datasets extracted from NGSIM can be dowloaed from [her
 - Maximum spatial-level attention weights regrading the lane-changing behaviors of the target vehicle 2858:
 
 <p float="centered">
-  <img src="images/attention_single_veh.png" width="300" height="700" />
+  <img src="images/attention_single_veh.png" width="400" height="500" />
 </p>
 
 
