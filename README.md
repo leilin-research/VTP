@@ -42,7 +42,7 @@ The training/val/testing datasets extracted from NGSIM can be dowloaed from [her
 - Distributions of spatial-level attention weights by target vehicle class (excluding weights in the target vehicle's cell):
 
 <p float="centered">
-  <img src="images/spatial-class.png" width="700" height="300" />
+  <img src="images/spatial-class.png" width="600" height="300" />
 </p>
 
 - Averaged spatial-level attention weights by the number of neighboring vehicles:
@@ -51,7 +51,11 @@ The training/val/testing datasets extracted from NGSIM can be dowloaed from [her
   <img src="images/density.png" width="700" height="300" />
 </p>
 
+- Maximum spatial-level attention weight frequency by target vehicle location:
 
+<p float="centered">
+  <img src="images/101-attention.png" width="700" height="300" />
+</p>
 
 
 
