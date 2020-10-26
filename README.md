@@ -10,11 +10,15 @@ STA-LSTM achieves comparable prediction performance against other state-of-the-a
 <td colspan=1>Models <td colspan=5>RMSE per prediction time step
 <tr>
 <td colspan=1> <td colspan=1>1 <td colspan=1>2<td colspan=1>3 <td colspan=1>4 <td colspan=1>5
-
+<tr>
 <td colspan=1>physics-based model <td colspan=1>1 <td colspan=1>2<td colspan=1>3 <td colspan=1>4 <td colspan=1>5
+<tr>
 <td colspan=1>naive LSTM <td colspan=1>1 <td colspan=1>2<td colspan=1>3 <td colspan=1>4 <td colspan=1>5
+<tr>
 <td colspan=1>SA-LSTM <td colspan=1>1 <td colspan=1>2<td colspan=1>3 <td colspan=1>4 <td colspan=1>5
+<tr>
 <td colspan=1>CS-LSTM <td colspan=1>1 <td colspan=1>2<td colspan=1>3 <td colspan=1>4 <td colspan=1>5
+<tr>
 <td colspan=1>STA-LSTM <td colspan=1>1 <td colspan=1>2<td colspan=1>3 <td colspan=1>4 <td colspan=1>5
 
 </table>
