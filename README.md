@@ -1,14 +1,16 @@
 # VTP: Vehicle Trajectory Prediction with Deep Learning Models
 
+## Data:
+The training/val/testing datasets extracted from NGSIM can be dowloaed from [here](https://drive.google.com/open?id=1dFMpX8HeCradMaCh4h0bD60h8k3M65Fw).
 
 ## STA-LSTM: An LSTM model with spatial-temporal attention mechanisms
-- STA-LSTM utilizes $T$-step historical trajectories of all vehicles within a 3×13 grid centered around the target vehicle to predict its future trajectories. The architecture of STA-LSTM is shown below:
+- STA-LSTM utilizes *T*-step historical trajectories of all vehicles within a 3×13 grid centered around the target vehicle to predict its future trajectories. The architecture of STA-LSTM is shown below:
 
 <p float="centered">
   <img src="images/sta-lstm.png" width="750" height="400" />
 </p>
 
-- STA-LSTM achieves comparable prediction performance against other state-of-the-art models. 
+- STA-LSTM achieves comparable prediction performance against other state-of-the-art models:
 
 
 <table>
@@ -30,11 +32,14 @@
 </table>
 
 
+- Average temporal-level attention weights of previous 6 time steps:
 
+<p float="centered">
+  <img src="images/temporal-weights.png" width="400" height="400" />
+</p>
 
 [1] Nachiket Deo and Mohan M. Trivedi,"Convolutional Social Pooling for Vehicle Trajectory Prediction." CVPRW, 2018
 
-# Data:
-The training/val/testing datasets can be dowloaed from [here](https://drive.google.com/open?id=1dFMpX8HeCradMaCh4h0bD60h8k3M65Fw).
+
 
 
