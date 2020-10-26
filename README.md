@@ -10,7 +10,7 @@ The training/val/testing datasets extracted from NGSIM can be dowloaed from [her
   <img src="images/sta-lstm.png" width="750" height="400" />
 </p>
 
-- STA-LSTM achieves comparable prediction performance against other state-of-the-art models:
+### STA-LSTM achieves comparable prediction performance against other state-of-the-art models:
 
 
 <table>
@@ -33,11 +33,13 @@ The training/val/testing datasets extracted from NGSIM can be dowloaed from [her
 
 [1] Nachiket Deo and Mohan M. Trivedi,"Convolutional Social Pooling for Vehicle Trajectory Prediction." CVPRW, 2018
 
-- Average temporal-level attention weights of previous 6 time steps:
+### Average temporal-level attention weights of previous 6 time steps:
 
 <p float="centered">
   <img src="images/temporal-weights.png" width="300" height="300" />
 </p>
+
+### Spatial-level Attention weight analysis
 
 - Distributions of spatial-level attention weights by target vehicle class (excluding weights in the target vehicle's cell):
 
