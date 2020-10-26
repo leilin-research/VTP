@@ -35,7 +35,7 @@ The training/val/testing datasets extracted from NGSIM can be dowloaed from [her
 - Average temporal-level attention weights of previous 6 time steps:
 
 <p float="centered">
-  <img src="images/temporal-weights.png" width="350" height="350" />
+  <img src="images/temporal-weights.png" width="300" height="300" />
 </p>
 
 [1] Nachiket Deo and Mohan M. Trivedi,"Convolutional Social Pooling for Vehicle Trajectory Prediction." CVPRW, 2018
