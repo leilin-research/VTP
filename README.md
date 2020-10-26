@@ -5,7 +5,7 @@
 - STA-LSTM utilizes T-step historical trajectories of all vehicles within a 3×13 grid centered around the target vehicle to predict its future trajectories. The architecture of STA-LSTM is shown below:
 
 <p float="left">
-  <img src="images/sta-lstm.png" width="750" height="250" />
+  <img src="images/sta-lstm.png" width="750" height="500" />
 </p>
 
 STA-LSTM achieves comparable prediction performance against other state-of-the-art models. 
