@@ -31,6 +31,7 @@ The training/val/testing datasets extracted from NGSIM can be dowloaed from [her
 
 </table>
 
+[1] Nachiket Deo and Mohan M. Trivedi,"Convolutional Social Pooling for Vehicle Trajectory Prediction." CVPRW, 2018
 
 - Average temporal-level attention weights of previous 6 time steps:
 
@@ -38,7 +39,14 @@ The training/val/testing datasets extracted from NGSIM can be dowloaed from [her
   <img src="images/temporal-weights.png" width="300" height="300" />
 </p>
 
-[1] Nachiket Deo and Mohan M. Trivedi,"Convolutional Social Pooling for Vehicle Trajectory Prediction." CVPRW, 2018
+- Distributions of spatial-level attention weights by target vehicle class (excluding weights in the target vehicle's cell):
+
+<p float="centered">
+  <img src="images/spatial-class.png" width="750" height="300" />
+</p>
+
+
+
 
 
 
