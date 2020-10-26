@@ -2,13 +2,13 @@
 
 
 ## STA-LSTM: An LSTM model with spatial-temporal attention mechanisms
-- STA-LSTM utilizes T-step historical trajectories of all vehicles within a 3×13 grid centered around the target vehicle to predict its future trajectories. The architecture of STA-LSTM is shown below:
+- STA-LSTM utilizes $T$-step historical trajectories of all vehicles within a 3×13 grid centered around the target vehicle to predict its future trajectories. The architecture of STA-LSTM is shown below:
 
 <p float="centered">
   <img src="images/sta-lstm.png" width="750" height="400" />
 </p>
 
-STA-LSTM achieves comparable prediction performance against other state-of-the-art models. 
+- STA-LSTM achieves comparable prediction performance against other state-of-the-art models. 
 
 
 <table>
@@ -28,6 +28,7 @@ STA-LSTM achieves comparable prediction performance against other state-of-the-a
 <td colspan=1>STA-LSTM <td colspan=1>0.0995 <td colspan=1>0.2002 <td colspan=1>0.3130 <td colspan=1>0.4348 <td colspan=1>0.5615
 
 </table>
+
 
 
 
