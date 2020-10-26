@@ -7,11 +7,12 @@ STA-LSTM achieves comparable prediction performance against other state-of-the-a
 
 | Models     | RMSE per prediction time step |
 | ---      | ---       |
-| physics-based model |          |
-| naive LSTM     |         |
-| SA-LSTM     |         |
-| CS-LSTM     |         |
-| STA-LSTM     |         |
+| ---      | 1       |2       |3       |4       |5      |
+| physics-based model |          |2       |3       |4       |5      |
+| naive LSTM     |         |2       |3       |4       |5      |
+| SA-LSTM     |         |2       |3       |4       |5      |
+| CS-LSTM     |         |2       |3       |4       |5      |
+| STA-LSTM     |         |2       |3       |4       |5      |
 
 [1] Nachiket Deo and Mohan M. Trivedi,"Convolutional Social Pooling for Vehicle Trajectory Prediction." CVPRW, 2018
 
