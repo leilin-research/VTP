@@ -174,25 +174,6 @@ def outputActivation(x):
     out = torch.cat([muX, muY, sigX, sigY, rho],dim=2)
     return out
 
-## Batchwise NLL loss, uses mask for variable output lengths
-def maskedNLL(y_pred, y_gt, mask):
-    acc = torch.zeros_like(mask)
-    muX = y_pred[:,:,0]
-    muY = y_pred[:,:,1]
-    sigX = y_pred[:,:,2]
-    sigY = y_pred[:,:,3]
-    rho = y_pred[:,:,4]
-    ohr = torch.pow(1-torch.pow(rho,2),-0.5)
-    x = y_gt[:,:, 0]
-    y = y_gt[:,:, 1]
-    out = torch.pow(ohr, 2)*(torch.pow(sigX, 2)*torch.pow(x-muX, 2) + torch.pow(sigY, 2)*torch.pow(y-muY, 2) - 2*rho*torch.pow(sigX, 1)*torch.pow(sigY, 1)*(x-muX)*(y-muY)) - torch.log(sigX*sigY*ohr)
-    # this is "negative log-likelihood of bivariate gaussian model"
-    #print ('out is ', out.size())
-    acc[:,:,0] = out # size (25, 128)
-    acc[:,:,1] = out # later use sum(mask) and take the average will make this correct
-    acc = acc*mask
-    lossVal = torch.sum(acc)/torch.sum(mask) # by taking the average, the result will be correct
-    return lossVal
 
 ## NLL for sequence, outputs sequence of NLL values for each time-step, uses mask for variable output lengths, used for evaluation
 def maskedNLLTest(fut_pred, lat_pred, lon_pred, fut, op_mask, num_lat_classes=3, num_lon_classes = 2,use_maneuvers = True, avg_along_time = False):
@@ -279,13 +260,3 @@ def maskedMSETest(y_pred, y_gt, mask):
     counts = torch.sum(mask[:,:,0],dim=1)
     return lossVal, counts
 
-## Helper function for log sum exp calculation:
-def logsumexp(inputs, dim=None, keepdim=False):
-    if dim is None:
-        inputs = inputs.view(-1)
-        dim = 0
-    s, _ = torch.max(inputs, dim=dim, keepdim=True)
-    outputs = s + (inputs - s).exp().sum(dim=dim, keepdim=True).log()
-    if not keepdim:
-        outputs = outputs.squeeze(dim)
-    return outputs

@@ -1,7 +1,7 @@
 from __future__ import print_function
 import torch
 from model import highwayNet
-from utils import ngsimDataset,maskedNLL,maskedMSE,maskedNLLTest
+from utils import ngsimDataset,maskedMSE
 from torch.utils.data import DataLoader
 import time
 import math
@@ -15,13 +15,9 @@ args['decoder_size'] = 128 # lstm decoder  hidden state size, adjustable
 args['in_length'] = 16
 args['out_length'] = 5
 args['grid_size'] = (13,3)
-args['soc_conv_depth'] = 64 # social pooling stuff
-args['conv_3x1_depth'] = 16 # social pooling stuff
-args['dyn_embedding_size'] = 32 # maneuver stuff
+
 args['input_embedding_size'] = 32 # input dimension for lstm encoder, adjustable
-args['num_lat_classes'] = 3
-args['num_lon_classes'] = 2
-args['use_maneuvers'] = False
+
 args['train_flag'] = True
 
 
@@ -34,7 +30,6 @@ if args['use_cuda']:
 
 
 ## Initialize optimizer
-pretrainEpochs = 0
 trainEpochs = 10
 optimizer = torch.optim.Adam(net.parameters()) #lr = ...
 batch_size = 128
@@ -42,8 +37,8 @@ crossEnt = torch.nn.BCELoss() # binary cross entropy
 
 
 ## Initialize data loaders
-trSet = ngsimDataset('/home/lei/workspace/data/trajectory/TrainSet.mat')
-valSet = ngsimDataset('/home/lei/workspace/data/trajectory/ValSet.mat')
+trSet = ngsimDataset('../../data/trajectory/TrainSet.mat')
+valSet = ngsimDataset('../../data/trajectory/ValSet.mat')
 trDataloader = DataLoader(trSet,batch_size=batch_size,shuffle=True,num_workers=8,collate_fn=trSet.collate_fn)
 valDataloader = DataLoader(valSet,batch_size=batch_size,shuffle=True,num_workers=8,collate_fn=valSet.collate_fn)
 
@@ -53,12 +48,7 @@ train_loss = []
 val_loss = []
 prev_val_loss = math.inf
 
-for epoch_num in range(pretrainEpochs+trainEpochs):
-    if epoch_num == 0:
-        print('Pre-training with MSE loss')
-    elif epoch_num == pretrainEpochs:
-        print('Training with NLL loss')
-
+for epoch_num in range(trainEpochs):
 
     ## Train:_________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
     net.train_flag = True
@@ -84,24 +74,12 @@ for epoch_num in range(pretrainEpochs+trainEpochs):
             fut = fut.cuda()
             op_mask = op_mask.cuda()
 
-        # Forward pass
-        if args['use_maneuvers']:
-            fut_pred, lat_pred, lon_pred = net(hist, nbrs, mask, lat_enc, lon_enc)
-            # Pre-train with MSE loss to speed up training
-            if epoch_num < pretrainEpochs:
-                l = maskedMSE(fut_pred, fut, op_mask)
-            else:
-            # Train with NLL loss
-                #print ('lon_enc is, ', lon_enc.size()) # (128, 2)
-                l = maskedNLL(fut_pred, fut, op_mask) + crossEnt(lat_pred, lat_enc) + crossEnt(lon_pred, lon_enc) # ?? really, lat_enc and lon_enc are historical 
-                avg_lat_acc += (torch.sum(torch.max(lat_pred.data, 1)[1] == torch.max(lat_enc.data, 1)[1])).item() / lat_enc.size()[0]
-                avg_lon_acc += (torch.sum(torch.max(lon_pred.data, 1)[1] == torch.max(lon_enc.data, 1)[1])).item() / lon_enc.size()[0]
+
+        fut_pred, weight_ts_center, weight_ts_nbr, weight_ha = net(hist, nbrs, mask, lat_enc, lon_enc)
+        if epoch_num < pretrainEpochs:
+            l = maskedMSE(fut_pred, fut, op_mask)
         else:
-            fut_pred, weight_ts_center, weight_ts_nbr, weight_ha = net(hist, nbrs, mask, lat_enc, lon_enc)
-            if epoch_num < pretrainEpochs:
-                l = maskedMSE(fut_pred, fut, op_mask)
-            else:
-                l = maskedMSE(fut_pred, fut, op_mask)#maskedNLL(fut_pred, fut, op_mask)
+            l = maskedMSE(fut_pred, fut, op_mask)#maskedNLL(fut_pred, fut, op_mask)
 
         # Backprop and update weights
         optimizer.zero_grad()
@@ -151,25 +129,13 @@ for epoch_num in range(pretrainEpochs+trainEpochs):
             fut = fut.cuda()
             op_mask = op_mask.cuda()
 
-        # Forward pass
-        if args['use_maneuvers']:
-            if epoch_num < pretrainEpochs:
-                # During pre-training with MSE loss, validate with MSE for true maneuver class trajectory
-                net.train_flag = True
-                fut_pred, _ , _ = net(hist, nbrs, mask, lat_enc, lon_enc)
-                l = maskedMSE(fut_pred, fut, op_mask)
-            else:
-                # During training with NLL loss, validate with NLL over multi-modal distribution
-                fut_pred, lat_pred, lon_pred = net(hist, nbrs, mask, lat_enc, lon_enc)
-                l = maskedNLLTest(fut_pred, lat_pred, lon_pred, fut, op_mask,avg_along_time = True) # why it is masketNLLTest for validation dataset
-                avg_val_lat_acc += (torch.sum(torch.max(lat_pred.data, 1)[1] == torch.max(lat_enc.data, 1)[1])).item() / lat_enc.size()[0]
-                avg_val_lon_acc += (torch.sum(torch.max(lon_pred.data, 1)[1] == torch.max(lon_enc.data, 1)[1])).item() / lon_enc.size()[0]
+
+        fut_pred, weight_ts_center, weight_ts_nbr, weight_ha = net(hist, nbrs, mask, lat_enc, lon_enc)
+
+        if epoch_num < pretrainEpochs:
+            l = maskedMSE(fut_pred, fut, op_mask)
         else:
-            fut_pred, weight_ts_center, weight_ts_nbr, weight_ha = net(hist, nbrs, mask, lat_enc, lon_enc)
-            if epoch_num < pretrainEpochs:
-                l = maskedMSE(fut_pred, fut, op_mask)
-            else:
-                l = maskedMSE(fut_pred, fut, op_mask)#maskedNLL(fut_pred, fut, op_mask)
+            l = maskedMSE(fut_pred, fut, op_mask)#maskedNLL(fut_pred, fut, op_mask)
 
         avg_val_loss += l.item()
         val_batch_count += 1
@@ -188,7 +154,7 @@ end_time = datetime.datetime.now()
 print('Total training time: ', end_time-start_time)
     #__________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
 
-torch.save(net.state_dict(), 'trained_models/ha_lstm_05122019.tar')
+torch.save(net.state_dict(), 'trained_models/sta_lstm_10272020.tar')
 
 
 
