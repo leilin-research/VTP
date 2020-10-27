@@ -34,7 +34,6 @@ class ngsimDataset(Dataset):
         grid = self.D[idx,8:]
         neighbors = []
 
-        # Get track history 'hist' = ndarray, and future track 'fut' = ndarray
         hist = self.getHistory(vehId,t,vehId,dsId) # history of the same target vehicle
         fut = self.getFuture(vehId,t,dsId) # future of the target vehicle
 
@@ -42,14 +41,11 @@ class ngsimDataset(Dataset):
         for i in grid: # neighbors found from data preprocessing
             neighbors.append(self.getHistory(i.astype(int), t,vehId,dsId)) # history of neighbor vehicles
 
-        # Maneuvers 'lon_enc' = one-hot vector, 'lat_enc = one-hot vector
         lon_enc = np.zeros([2])
         lon_enc[int(self.D[idx, 7] - 1)] = 1
         lat_enc = np.zeros([3])
         lat_enc[int(self.D[idx, 6] - 1)] = 1
-        #if vehId == 2328:
-        #    print ('index is ', idx)
-        #    print ('t is ', t)
+
 
         return hist,fut,neighbors,lat_enc,lon_enc, vehId, t, dsId
 
@@ -98,7 +94,7 @@ class ngsimDataset(Dataset):
         for _,_,nbrs,_,_,_,_,_ in samples:
             nbr_batch_size += sum([len(nbrs[i])!=0 for i in range(len(nbrs))]) # pick neighbors that are not zeros
         maxlen = self.t_h//self.d_s + 1
-        #print ('nbr_batch_size is ', nbr_batch_size)
+
         if nbr_batch_size != 0:
             nbrs_batch = torch.zeros(maxlen,nbr_batch_size,2)
 
@@ -122,7 +118,7 @@ class ngsimDataset(Dataset):
             time = []
             dsID = []
             for sampleId,(hist, fut, nbrs, lat_enc, lon_enc, vehId, t, ds) in enumerate(samples):
-            #print ('sampleId is: ', sampleId)
+
 	    # Set up history, future, lateral maneuver and longitudinal maneuver batches:
                 hist_batch[0:len(hist),sampleId,0] = torch.from_numpy(hist[:, 0]) # NOTE here it is [0:len(hist), ...] not maxlen
                 hist_batch[0:len(hist), sampleId, 1] = torch.from_numpy(hist[:, 1])
@@ -138,18 +134,15 @@ class ngsimDataset(Dataset):
             # Set up neighbor, neighbor sequence length, and mask batches:
                 for id,nbr in enumerate(nbrs):
                     if len(nbr)!=0: # recall that in getHistory(), if there is no neighbor, it returns an empty array [0, 2], the length of which is 0
-                    #print ('count is: ', count)
+
                         nbrs_batch[0:len(nbr),count,0] = torch.from_numpy(nbr[:, 0])
                         nbrs_batch[0:len(nbr), count, 1] = torch.from_numpy(nbr[:, 1])
 		    # id is from 0-38, because each nbrs is a list of length 39, if there is neighbor, there is values, otherwist it is appended [0, 0]
-                        pos[0] = id % self.grid_size[0] # qu yu
-                        pos[1] = id // self.grid_size[0] # qu zheng, self.grid_size[0] is 13; < 13, pos[1] = 0, left; =13, pos[1] = 1, middle;
-                    #print ('id is ', id)
-                    #print ('self.grid_size[0] is ', self.grid_size[0])
-                    #print ('pos[0] is ', pos[0])
-                    #print ('pos[1] is ', pos[1])
+                        pos[0] = id % self.grid_size[0] 
+                        pos[1] = id // self.grid_size[0] 
+
                         mask_batch[sampleId,pos[1],pos[0],:] = torch.ones(self.enc_size).byte()
-                        count+=1 # is it useful here?
+                        count+=1 
 
             return hist_batch, nbrs_batch, mask_batch, lat_enc_batch, lon_enc_batch, fut_batch, op_mask_batch, veh_ID, time, dsID #output mask
         else:
@@ -165,71 +158,9 @@ class ngsimDataset(Dataset):
 def outputActivation(x):
     muX = x[:,:,0:1]
     muY = x[:,:,1:2]
-    sigX = x[:,:,2:3]
-    sigY = x[:,:,3:4]
-    rho = x[:,:,4:5]
-    sigX = torch.exp(sigX)
-    sigY = torch.exp(sigY)
-    rho = torch.tanh(rho)
-    out = torch.cat([muX, muY, sigX, sigY, rho],dim=2)
+
+    out = torch.cat([muX, muY],dim=2)
     return out
-
-
-## NLL for sequence, outputs sequence of NLL values for each time-step, uses mask for variable output lengths, used for evaluation
-def maskedNLLTest(fut_pred, lat_pred, lon_pred, fut, op_mask, num_lat_classes=3, num_lon_classes = 2,use_maneuvers = True, avg_along_time = False):
-    if use_maneuvers:
-        acc = torch.zeros(op_mask.shape[0],op_mask.shape[1],num_lon_classes*num_lat_classes).cuda()
-        count = 0
-        for k in range(num_lon_classes):
-            for l in range(num_lat_classes):
-                wts = lat_pred[:,l]*lon_pred[:,k]
-                wts = wts.repeat(len(fut_pred[0]),1)
-                y_pred = fut_pred[k*num_lat_classes + l]
-                y_gt = fut
-                muX = y_pred[:, :, 0]
-                muY = y_pred[:, :, 1]
-                sigX = y_pred[:, :, 2]
-                sigY = y_pred[:, :, 3]
-                rho = y_pred[:, :, 4]
-                ohr = torch.pow(1 - torch.pow(rho, 2), -0.5)
-                x = y_gt[:, :, 0]
-                y = y_gt[:, :, 1]
-                out = -(torch.pow(ohr, 2) * (torch.pow(sigX, 2) * torch.pow(x - muX, 2) + torch.pow(sigY, 2) * torch.pow(y - muY,2) - 2 * rho * torch.pow(sigX, 1) * torch.pow(sigY, 1) * (x - muX) * (y - muY)) - torch.log(sigX * sigY * ohr)) # why two equations are not the same as masketNLL, this is log-likelihood
-                acc[:, :, count] =  out + torch.log(wts)
-                count+=1
-        acc = -logsumexp(acc,dim = 2)
-        acc = acc * op_mask[:,:,0]
-        if avg_along_time:
-            lossVal = torch.sum(acc) / torch.sum(op_mask[:, :, 0])
-            return lossVal
-        else:
-            lossVal = torch.sum(acc,dim=1)
-            counts = torch.sum(op_mask[:,:,0],dim=1)
-            return lossVal,counts
-    else:
-        acc = torch.zeros(op_mask.shape[0], op_mask.shape[1], 1).cuda()
-        y_pred = fut_pred
-        y_gt = fut
-        muX = y_pred[:, :, 0]
-        muY = y_pred[:, :, 1]
-        sigX = y_pred[:, :, 2]
-        sigY = y_pred[:, :, 3]
-        rho = y_pred[:, :, 4]
-        ohr = torch.pow(1 - torch.pow(rho, 2), -0.5)
-        x = y_gt[:, :, 0]
-        y = y_gt[:, :, 1]
-        out = torch.pow(ohr, 2) * (
-        torch.pow(sigX, 2) * torch.pow(x - muX, 2) + torch.pow(sigY, 2) * torch.pow(y - muY, 2) - 2 * rho * torch.pow(
-            sigX, 1) * torch.pow(sigY, 1) * (x - muX) * (y - muY)) - torch.log(sigX * sigY * ohr)
-        acc[:, :, 0] = out
-        acc = acc * op_mask[:, :, 0:1]
-        if avg_along_time:
-            lossVal = torch.sum(acc[:, :, 0]) / torch.sum(op_mask[:, :, 0])
-            return lossVal
-        else:
-            lossVal = torch.sum(acc[:,:,0], dim=1)
-            counts = torch.sum(op_mask[:, :, 0], dim=1)
-            return lossVal,counts
 
 ## Batchwise MSE loss, uses mask for variable output lengths
 def maskedMSE(y_pred, y_gt, mask):
@@ -239,7 +170,7 @@ def maskedMSE(y_pred, y_gt, mask):
     x = y_gt[:,:, 0]
     y = y_gt[:,:, 1]
     out = torch.pow(x-muX, 2) + torch.pow(y-muY, 2)
-    acc[:,:,0] = out #why x and y loss are both "out"?
+    acc[:,:,0] = out 
     acc[:,:,1] = out
     acc = acc*mask
     lossVal = torch.sum(acc)/torch.sum(mask) # although both uses out, the average will be correct, 2*out/2
@@ -253,7 +184,7 @@ def maskedMSETest(y_pred, y_gt, mask):
     x = y_gt[:, :, 0]
     y = y_gt[:, :, 1]
     out = torch.pow(x - muX, 2) + torch.pow(y - muY, 2)
-    acc[:, :, 0] = out #why x and y loss are both "out"?
+    acc[:, :, 0] = out 
     acc[:, :, 1] = out
     acc = acc * mask
     lossVal = torch.sum(acc[:,:,0],dim=1)

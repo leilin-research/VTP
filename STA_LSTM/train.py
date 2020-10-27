@@ -76,10 +76,8 @@ for epoch_num in range(trainEpochs):
 
 
         fut_pred, weight_ts_center, weight_ts_nbr, weight_ha = net(hist, nbrs, mask, lat_enc, lon_enc)
-        if epoch_num < pretrainEpochs:
-            l = maskedMSE(fut_pred, fut, op_mask)
-        else:
-            l = maskedMSE(fut_pred, fut, op_mask)#maskedNLL(fut_pred, fut, op_mask)
+
+        l = maskedMSE(fut_pred, fut, op_mask)#maskedNLL(fut_pred, fut, op_mask)
 
         # Backprop and update weights
         optimizer.zero_grad()
@@ -132,10 +130,8 @@ for epoch_num in range(trainEpochs):
 
         fut_pred, weight_ts_center, weight_ts_nbr, weight_ha = net(hist, nbrs, mask, lat_enc, lon_enc)
 
-        if epoch_num < pretrainEpochs:
-            l = maskedMSE(fut_pred, fut, op_mask)
-        else:
-            l = maskedMSE(fut_pred, fut, op_mask)#maskedNLL(fut_pred, fut, op_mask)
+
+        l = maskedMSE(fut_pred, fut, op_mask)
 
         avg_val_loss += l.item()
         val_batch_count += 1
