@@ -59,7 +59,7 @@ The training/val/testing datasets extracted from NGSIM can be dowloaed from [her
   <img src="images/101-attention.png" width="700" height="300" />
 </p>
 
-- Maximum spatial-level attention weights regrading the lane-changing behaviors of the target vehicle 2858:
+- Maximum spatial-level attention weights regrading the lane-changing behaviors of the target vehicle 2858: The target vehicle 2858 executed two lane-changing maneuvers around the 996th and 1220th time steps. The vehicle relocated the maximum attention from the current lane to *(Right, 1)* and *(Right, 2)*, as it was preparing to change to the right lane.
 
 <p float="centered">
   <img src="images/attention_single_veh.png" width="400" height="500" />
