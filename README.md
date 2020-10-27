@@ -6,7 +6,7 @@ The training/val/testing datasets extracted from NGSIM can be dowloaed from [her
 ## STA-LSTM: An LSTM model with spatial-temporal attention mechanisms
 - STA-LSTM utilizes *T*-step historical trajectories of all vehicles within a 3×13 grid centered around the target vehicle to predict its future trajectories. The architecture of STA-LSTM is shown below:
 
-<p float="centered">
+<p align="center">
   <img src="images/sta-lstm.png" width="750" height="400" />
 </p>
 
@@ -35,7 +35,7 @@ The training/val/testing datasets extracted from NGSIM can be dowloaed from [her
 
 ### Average temporal-level attention weights of previous 6 time steps:
 
-<p float="centered">
+<p align="center">
   <img src="images/temporal-weights.png" width="300" height="300" />
 </p>
 
@@ -43,25 +43,25 @@ The training/val/testing datasets extracted from NGSIM can be dowloaed from [her
 
 - Distributions of spatial-level attention weights by target vehicle class (excluding weights in the target vehicle's cell):
 
-<p float="centered">
+<p align="center">
   <img src="images/spatial-class.png" width="600" height="300" />
 </p>
 
 - Averaged spatial-level attention weights by the number of neighboring vehicles:
 
-<p float="centered">
+<p align="center">
   <img src="images/density.png" width="700" height="300" />
 </p>
 
 - Maximum spatial-level attention weight frequency by target vehicle location:
 
-<p float="centered">
+<p align="center">
   <img src="images/101-attention.png" width="700" height="300" />
 </p>
 
 - Maximum spatial-level attention weights regrading the lane-changing behaviors of the target vehicle 2858: The target vehicle 2858 executed two lane-changing maneuvers around the 996th and 1220th time steps. The vehicle relocated the maximum attention from the current lane to *(Right, 1)* and *(Right, 2)*, as it was preparing to change to the right lane.
 
-<p float="centered">
+<p align="center">
   <img src="images/attention_single_veh.png" width="400" height="500" />
 </p>
 
