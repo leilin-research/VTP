@@ -17,9 +17,6 @@ class highwayNet(nn.Module):
         ## Use gpu flag
         self.use_cuda = args['use_cuda']
 
-        # Flag for maneuver based (True) vs uni-modal decoder (False)
-        self.use_maneuvers = args['use_maneuvers']
-
         # Flag for train mode (True) vs test-mode (False)
         self.train_flag = args['train_flag']
 
@@ -29,13 +26,8 @@ class highwayNet(nn.Module):
         self.in_length = args['in_length']
         self.out_length = args['out_length']
         self.grid_size = args['grid_size']
-        self.soc_conv_depth = args['soc_conv_depth']
-        self.conv_3x1_depth = args['conv_3x1_depth']
-        self.dyn_embedding_size = args['dyn_embedding_size'] # 32
+
         self.input_embedding_size = args['input_embedding_size']
-        self.num_lat_classes = args['num_lat_classes']
-        self.num_lon_classes = args['num_lon_classes']
-        self.soc_embedding_size = (((args['grid_size'][0]-4)+1)//2)*self.conv_3x1_depth
 
         ## Define network weights
 
@@ -57,29 +49,12 @@ class highwayNet(nn.Module):
             nn.Linear(self.encoder_size, 1), # (batch_size, sequenc_len, hidden_size) * (hidden_size, 1)
         )
 
-        '''
-        # Vehicle dynamics embedding
-        self.dyn_emb = torch.nn.Linear(self.encoder_size,self.dyn_embedding_size)
 
-        # Convolutional social pooling layer and social embedding layer
-        self.soc_conv = torch.nn.Conv2d(self.encoder_size,self.soc_conv_depth,3)
-        self.conv_3x1 = torch.nn.Conv2d(self.soc_conv_depth, self.conv_3x1_depth, (3,1)) # input channel, output channe, kernel size(3, 1): tuple of two ints – in which case, the first int is used for the height dimension, and the second int for the width dimension
-        self.soc_maxpool = torch.nn.MaxPool2d((2,1),padding = (1,0))
-
-        # FC social pooling layer (for comparison):
-        # self.soc_fc = torch.nn.Linear(self.soc_conv_depth * self.grid_size[0] * self.grid_size[1], (((args['grid_size'][0]-4)+1)//2)*self.conv_3x1_depth)
-
-        # Decoder LSTM
-        if self.use_maneuvers:
-            self.dec_lstm = torch.nn.LSTM(self.soc_embedding_size + self.dyn_embedding_size + self.num_lat_classes + self.num_lon_classes, self.decoder_size) # 80+32+3+2, 128
-        else:
-        '''
         self.dec_lstm = torch.nn.LSTM(self.encoder_size, self.decoder_size) # 112, 128
 
         # Output layers:
         self.op = torch.nn.Linear(self.decoder_size,5)
-        self.op_lat = torch.nn.Linear(self.soc_embedding_size + self.dyn_embedding_size, self.num_lat_classes)
-        self.op_lon = torch.nn.Linear(self.soc_embedding_size + self.dyn_embedding_size, self.num_lon_classes)
+
 
         # Activations:
         self.leaky_relu = torch.nn.LeakyReLU(0.1)
@@ -130,37 +105,14 @@ class highwayNet(nn.Module):
         new_nbrs_hidden, soft_nbrs_attn_weights = self.attention(nbrs_lstm_weight, nbrs_out) # new_hidden: 128, 64
         nbrs_enc = new_nbrs_hidden
         # end: apply attention mechanism to neighbors
-        
-        '''
-        # not apply attention to neighbors
-        #print ('before', nbrs_enc.size()) # example (1, 991, 64), 16 will be the timesteps in LSTM; 1 is because the output is from the last LSTM cell; 991 number of neighbors, 2-x and y locations
-        nbrs_enc = nbrs_enc.view(nbrs_enc.shape[1], nbrs_enc.shape[2]) # squeeze the dimision 0, now becomes (991, 64)
-        #print ('after', nbrs_enc.size())
-        '''
+
         ## Masked scatter
         soc_enc = torch.zeros_like(masks).float() # mask size: (128, 3, 13, 64)
         #print ('masks size is ', masks.size())
         soc_enc = soc_enc.masked_scatter_(masks, nbrs_enc) # masked_scatter_(mask, source), Copies elements from source into self tensor at positions where the mask is one. Copy nbrs_enc values where masks is 0
-        #*********************
-        # this masked_scatter_ function is really important, 
-        # soc_enc and masks must have the same shape
-        # copy nbrs_enc values sequentially to soc_enc where masks is 1
+ 
         masks_tem = masks.permute(0, 3, 2, 1)
-        #print (masks_tem.size()[0])
-        #nbr_loc = [] # [left, middle, right] by 13 (from the back to the front)
-        #for k in range(masks_tem.size()[0]): # for each batch
-        #    tem = []
-            #print (k)
-        #    for i in range(masks_tem.size()[2]): # for each in 13 (from back to the front)
-        #        for j in range(masks_tem.size()[3]): # for each in 3 (from left to right)
-                    
-                    #print (j)
-                    #print (i)
-        #            if masks_tem[k, 0, i, j] != 0:
-        #                tem.append(1)
-        #            else:
-        #                tem.append(0)
-        #    nbr_loc.append(tem)
+
         soc_enc = soc_enc.permute(0,3,2,1) # soc_enc size: (128, 64, 13, 3)
         soc_enc = soc_enc.contiguous().view(soc_enc.shape[0], soc_enc.shape[1], -1) #128, 64, 39
         # print (soc_enc.size()) 128, 64, 39 
@@ -182,10 +134,10 @@ class highwayNet(nn.Module):
 
 
         fut_pred = self.decode(enc) 
-        return fut_pred, soft_attn_weights, soft_nbrs_attn_weights, soft_attn_weights_ha#, nbr_loc
+        return fut_pred, soft_attn_weights, soft_nbrs_attn_weights, soft_attn_weights_ha
 
-# soft_attn_weights and soft_nbrs_attn_weights are the attention weights across time steps (the ego-vehicle and neighbors)
-# soft_attn_weights_ha are the attention weights across vehicles (13 by 3 neighbors, row-wise flattern, [[1, 2, 3], [4, 5, 6], ...[X, X, X]], the 40th is the ego vehicle)
+        # soft_attn_weights and soft_nbrs_attn_weights are the attention weights across time steps (the ego-vehicle and neighbors)
+        # soft_attn_weights_ha are the attention weights across vehicles (13 by 3 neighbors, row-wise flattern, [[1, 2, 3], [4, 5, 6], ...[X, X, X]], the 40th is the ego vehicle)
 
 
     def decode(self,enc):

@@ -17,7 +17,7 @@ The training/val/testing datasets extracted from **NGSIM** can be dowloaed from 
 <tr>
 <td rowspan=2><b>Models</b> <td colspan=5><b>RMSE per prediction time step</b>
 <tr>
-<td colspan=1><b>1</b> <td colspan=1><b>2</b> <td colspan=1><b>3</b> <td colspan=1><b>4</b> <td colspan=1><b>5</b>
+<td colspan=1><b>1st</b> <td colspan=1><b>2nd</b> <td colspan=1><b>3rd</b> <td colspan=1><b>4th</b> <td colspan=1><b>5th</b>
 <tr>
 <td colspan=1>physics-based model <td colspan=1>0.1776 <td colspan=1>0.3852 <td colspan=1>0.6033 <td colspan=1>0.8377 <td colspan=1>1.0888
 <tr>
