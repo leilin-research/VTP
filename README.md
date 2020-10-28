@@ -65,8 +65,7 @@ The training/validation/test datasets extracted from [Next Generation Simulation
 </p>
 
 
-
-### Citation
+## Citation
 You are more than welcome to cite our paper.
 ```
 @article{lin2020stalstm,
