@@ -68,8 +68,8 @@ The training/validation/test datasets extracted from [Next Generation Simulation
 ## Citation
 You are more than welcome to cite our paper.
 ```
-@article{lin2020stalstm,
-  title={Vehicle Trajectory Prediction Using LSTMs withSpatial-Temporal Attention Mechanisms},
+@article{Lin2020Attention,
+  title={Vehicle Trajectory Prediction Using LSTMs with Spatial-Temporal Attention Mechanisms},
   author={Lin, Lei and Li, Weizi and Bi, Huikun and Qin, Lingqiao},
   journal={IEEE Intelligent Transportation Systems Magazine (ITSM)}
 }
