@@ -1,6 +1,6 @@
 # VTP: Deep Learning for Vehicle Trajectory Prediction
 
-## Data:
+## Data
 The training/validation/test datasets extracted from **[Next Generation Simulation (NGSIM) Vehicle Trajectories](https://www.opendatanetwork.com/dataset/data.transportation.gov/8ect-6jqj)** can be downloaded [here](https://drive.google.com/open?id=1dFMpX8HeCradMaCh4h0bD60h8k3M65Fw).
 
 ## STA-LSTM: An LSTM model with spatial-temporal attention mechanisms
@@ -10,8 +10,7 @@ The training/validation/test datasets extracted from **[Next Generation Simulati
   <img src="images/sta-lstm.png" width="750" height="400" />
 </p>
 
-### STA-LSTM achieves comparable prediction performance against other state-of-the-art models:
-
+### STA-LSTM achieves comparable prediction performance against other state-of-the-art models
 
 <table>
 <tr>
@@ -33,7 +32,7 @@ The training/validation/test datasets extracted from **[Next Generation Simulati
 
 [1] Nachiket Deo and Mohan M. Trivedi,"Convolutional Social Pooling for Vehicle Trajectory Prediction." CVPRW, 2018
 
-### Average temporal-level attention weights of the past six time steps:
+### Average temporal-level attention weights of the past six time steps
 
 <p align="center">
   <img src="images/temporal-weights.png" width="300" height="300" />
@@ -47,13 +46,13 @@ The training/validation/test datasets extracted from **[Next Generation Simulati
   <img src="images/spatial-class.png" width="600" height="300" />
 </p>
 
-- Averaged spatial-level attention weights by the number of neighboring vehicles:
+- Averaged spatial-level attention weights by the number of neighboring vehicles
 
 <p align="center">
   <img src="images/density.png" width="700" height="300" />
 </p>
 
-- Maximum spatial-level attention weight frequency by target vehicle location:
+- Maximum spatial-level attention weight frequency by target vehicle location
 
 <p align="center">
   <img src="images/101-attention.png" width="700" height="300" />
@@ -68,7 +67,7 @@ The training/validation/test datasets extracted from **[Next Generation Simulati
 
 
 ### Citation
-You are more than welcome to cite our paper:
+You are more than welcome to cite our paper.
 ```
 @article{lin2020stalstm,
   title={Vehicle Trajectory Prediction Using LSTMs withSpatial-Temporal Attention Mechanisms},
