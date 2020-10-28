@@ -1,7 +1,7 @@
-# VTP: Vehicle Trajectory Prediction with Deep Learning Models
+# VTP: Deep Learning for Vehicle Trajectory Prediction
 
 ## Data:
-The training/val/testing datasets extracted from **[Next Generation Simulation (NGSIM) Vehicle Trajectories](https://www.opendatanetwork.com/dataset/data.transportation.gov/8ect-6jqj)** can be dowloaed from [here](https://drive.google.com/open?id=1dFMpX8HeCradMaCh4h0bD60h8k3M65Fw).
+The training/validation/test datasets extracted from **[Next Generation Simulation (NGSIM) Vehicle Trajectories](https://www.opendatanetwork.com/dataset/data.transportation.gov/8ect-6jqj)** can be downloaded [here](https://drive.google.com/open?id=1dFMpX8HeCradMaCh4h0bD60h8k3M65Fw).
 
 ## STA-LSTM: An LSTM model with spatial-temporal attention mechanisms
 - STA-LSTM utilizes *T*-step historical trajectories of all vehicles within a 3×13 grid centered around the target vehicle to predict its future trajectories. The architecture of STA-LSTM is shown below:
@@ -33,13 +33,13 @@ The training/val/testing datasets extracted from **[Next Generation Simulation (
 
 [1] Nachiket Deo and Mohan M. Trivedi,"Convolutional Social Pooling for Vehicle Trajectory Prediction." CVPRW, 2018
 
-### Average temporal-level attention weights of previous 6 time steps:
+### Average temporal-level attention weights of the past six time steps:
 
 <p align="center">
   <img src="images/temporal-weights.png" width="300" height="300" />
 </p>
 
-### Spatial-level Attention weight analysis
+### Spatial-level attention weight analysis
 
 - Distributions of spatial-level attention weights by target vehicle class (excluding weights in the target vehicle's cell):
 
@@ -59,7 +59,7 @@ The training/val/testing datasets extracted from **[Next Generation Simulation (
   <img src="images/101-attention.png" width="700" height="300" />
 </p>
 
-- Maximum spatial-level attention weights regrading the lane-changing behaviors of the target vehicle 2858: The target vehicle 2858 executed two lane-changing maneuvers around the 996th and 1220th time steps. The vehicle relocated the maximum attention from the current lane to *(Right, 1)* and *(Right, 2)*, as it was preparing to change to the right lane.
+- Maximum spatial-level attention weights regrading the lane-changing behaviors of the target vehicle 2858. The target vehicle 2858 executed two lane-changing maneuvers around the 996th and 1220th time steps, respectively. The vehicle relocated the maximum attention from the current lane to (Right, 1) and (Right, 2), as it was preparing to change to the right lane.
 
 <p align="center">
   <img src="images/attention_single_veh.png" width="400" height="500" />
