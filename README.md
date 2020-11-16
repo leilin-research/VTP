@@ -8,7 +8,7 @@
 ### Performance of Attention-LSTM under different CAV Market Penetration Ratios
 
 <p align="center">
-  <img src="Attention-LSTM/images/RMSE_model_comparison.png" width="750" height="400" />
+  <img src="Attention-LSTM/images/RMSE_model_comparison.png" width="500" height="400" />
 </p>
 
 ## STA-LSTM: An LSTM model with spatial-temporal attention mechanisms
