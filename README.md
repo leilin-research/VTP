@@ -1,7 +1,9 @@
 # VTP: Deep Learning for Vehicle Trajectory Prediction
 
-## Data
-The training/validation/test datasets extracted from [Next Generation Simulation (NGSIM) Vehicle Trajectories](https://www.opendatanetwork.com/dataset/data.transportation.gov/8ect-6jqj) can be downloaded [here](https://drive.google.com/open?id=1dFMpX8HeCradMaCh4h0bD60h8k3M65Fw).
+## Attention-LSTM: An LSTM model in a Mixed Traffic Flow Environment (Connected and Autonomous Vehicle, Human-driven Vehicle)
+- Attention-LSTM assumes a Connected and Autonomous Vehicle (CAV) utilizes all the CAVs within its communication range (the front and back 200 meters in the left, middle and right lanes) to predict future trajectories of a target Human-driven Vehicle (HDV). 
+
+- Data: The training/validation/test datasets extracted from [Next Generation Simulation (NGSIM) Vehicle Trajectories](https://www.opendatanetwork.com/dataset/data.transportation.gov/8ect-6jqj) can be downloaded [here](https://drive.google.com/drive/folders/1rBm_332tbj4-BaFqf3XndaUH9_YeWjip?usp=sharing).
 
 ## STA-LSTM: An LSTM model with spatial-temporal attention mechanisms
 - STA-LSTM utilizes *T*-step historical trajectories of all vehicles within a 3×13 grid centered around the target vehicle to predict its future trajectories. The architecture of STA-LSTM is shown below:
@@ -9,6 +11,8 @@ The training/validation/test datasets extracted from [Next Generation Simulation
 <p align="center">
   <img src="STA_LSTM/images/sta-lstm.png" width="750" height="400" />
 </p>
+
+- Data: The training/validation/test datasets extracted from [Next Generation Simulation (NGSIM) Vehicle Trajectories](https://www.opendatanetwork.com/dataset/data.transportation.gov/8ect-6jqj) can be downloaded [here](https://drive.google.com/drive/folders/1dFMpX8HeCradMaCh4h0bD60h8k3M65Fw?usp=sharing).
 
 ### STA-LSTM achieves comparable prediction performance against other state-of-the-art models
 
