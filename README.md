@@ -5,11 +5,17 @@
 
 - Data: The training/validation/test datasets extracted from [Next Generation Simulation (NGSIM) Vehicle Trajectories](https://www.opendatanetwork.com/dataset/data.transportation.gov/8ect-6jqj) can be downloaded [here](https://drive.google.com/drive/folders/1rBm_332tbj4-BaFqf3XndaUH9_YeWjip?usp=sharing).
 
+### Performance of Attention-LSTM under different CAV Market Penetration Ratios
+
+<p align="center">
+  <img src="Attention-LSTM/images/RMSE_model_comparison.png" width="750" height="400" />
+</p>
+
 ## STA-LSTM: An LSTM model with spatial-temporal attention mechanisms
 - STA-LSTM utilizes *T*-step historical trajectories of all vehicles within a 3×13 grid centered around the target vehicle to predict its future trajectories. The architecture of STA-LSTM is shown below:
 
 <p align="center">
-  <img src="STA_LSTM/images/sta-lstm.png" width="750" height="400" />
+  <img src="STA-LSTM/images/sta-lstm.png" width="750" height="400" />
 </p>
 
 - Data: The training/validation/test datasets extracted from [Next Generation Simulation (NGSIM) Vehicle Trajectories](https://www.opendatanetwork.com/dataset/data.transportation.gov/8ect-6jqj) can be downloaded [here](https://drive.google.com/drive/folders/1dFMpX8HeCradMaCh4h0bD60h8k3M65Fw?usp=sharing).
@@ -39,7 +45,7 @@
 ### Average temporal-level attention weights of the past six time steps
 
 <p align="center">
-  <img src="STA_LSTM/images/temporal-weights.png" width="300" height="300" />
+  <img src="STA-LSTM/images/temporal-weights.png" width="300" height="300" />
 </p>
 
 ### Spatial-level attention weight analysis
@@ -47,25 +53,25 @@
 - Distributions of spatial-level attention weights by target vehicle class (excluding weights in the target vehicle's cell):
 
 <p align="center">
-  <img src="STA_LSTM/images/spatial-class.png" width="600" height="300" />
+  <img src="STA-LSTM/images/spatial-class.png" width="600" height="300" />
 </p>
 
 - Averaged spatial-level attention weights by the number of neighboring vehicles
 
 <p align="center">
-  <img src="STA_LSTM/images/density.png" width="700" height="300" />
+  <img src="STA-LSTM/images/density.png" width="700" height="300" />
 </p>
 
 - Maximum spatial-level attention weight frequency by target vehicle location
 
 <p align="center">
-  <img src="STA_LSTM/images/101-attention.png" width="700" height="300" />
+  <img src="STA-LSTM/images/101-attention.png" width="700" height="300" />
 </p>
 
 - Maximum spatial-level attention weights regrading the lane-changing behaviors of the target vehicle 2858. The target vehicle 2858 executed two lane-changing maneuvers around the 996th and 1220th time steps, respectively. The vehicle relocated the maximum attention from the current lane to (Right, 1) and (Right, 2), as it was preparing to change to the right lane.
 
 <p align="center">
-  <img src="STA_LSTM/images/lane-changing.png" width="400" height="500" />
+  <img src="STA-LSTM/images/lane-changing.png" width="400" height="500" />
 </p>
 
 
@@ -75,7 +81,7 @@ You are more than welcome to cite our paper.
 @article{Lin2020Attention,
   title={Vehicle Trajectory Prediction Using LSTMs with Spatial-Temporal Attention Mechanisms},
   author={Lin, Lei and Li, Weizi and Bi, Huikun and Qin, Lingqiao},
-  journal={IEEE Intelligent Transportation Systems Magazine (ITSM)}
+  journal={IEEE Intelligent Transportation Systems Magazine (ITSM) (under review)}
 }
 
 ```
