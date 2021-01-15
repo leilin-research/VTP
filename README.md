@@ -81,7 +81,7 @@ You are more than welcome to cite our paper.
 @article{Lin2020Attention,
   title={Vehicle Trajectory Prediction Using LSTMs with Spatial-Temporal Attention Mechanisms},
   author={Lin, Lei and Li, Weizi and Bi, Huikun and Qin, Lingqiao},
-  journal={IEEE Intelligent Transportation Systems Magazine (ITSM) (under review)}
+  journal={IEEE Intelligent Transportation Systems Magazine (ITSM)}
 }
 
 ```
