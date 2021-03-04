@@ -78,6 +78,15 @@
 ## Citation
 You are more than welcome to cite our paper.
 ```
+@article{lin2021long,
+  title={Long Short-Term Memory-Based Human-Driven Vehicle Longitudinal Trajectory Prediction in a Connected and Autonomous Vehicle Environment},
+  author={Lin, Lei and Gong, Siyuan and Peeta, Srinivas and Wu, Xia},
+  journal={Transportation Research Record},
+  pages={0361198121993471},
+  year={2021},
+  publisher={SAGE Publications Sage CA: Los Angeles, CA}
+}
+
 @article{Lin2020Attention,
   title={Vehicle Trajectory Prediction Using LSTMs with Spatial-Temporal Attention Mechanisms},
   author={Lin, Lei and Li, Weizi and Bi, Huikun and Qin, Lingqiao},
