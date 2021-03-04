@@ -76,7 +76,7 @@
 
 
 ## Citation
-You are more than welcome to cite our paper.
+You are more than welcome to cite our papers:
 ```
 @article{lin2021long,
   title={Long Short-Term Memory-Based Human-Driven Vehicle Longitudinal Trajectory Prediction in a Connected and Autonomous Vehicle Environment},
