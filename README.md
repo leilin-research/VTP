@@ -78,19 +78,24 @@
 ## Citation
 You are more than welcome to cite our papers:
 ```
-@article{lin2021long,
+@Article{Lin2022Attention,
+author = {Lei Lin and Weizi Li and Huikun Bi and Lingqiao Qin},
+title = {Vehicle Trajectory Prediction Using {LSTM}s with Spatial-Temporal Attention Mechanisms},
+journal = {IEEE Intelligent Transportation Systems Magazine},
+year = {2022},
+volume = {14},
+number = {2},
+pages = {197–-208},
+doi = {10.1109/MITS.2021.3049404}
+}
+
+@Article{Lin2021Long,
   title={Long Short-Term Memory-Based Human-Driven Vehicle Longitudinal Trajectory Prediction in a Connected and Autonomous Vehicle Environment},
-  author={Lin, Lei and Gong, Siyuan and Peeta, Srinivas and Wu, Xia},
+  author={Lei Lin and Siyuan Gong and Srinivas Peeta and Xia Wu},
   journal={Transportation Research Record},
   pages={0361198121993471},
   year={2021},
   publisher={SAGE Publications Sage CA: Los Angeles, CA}
-}
-
-@article{Lin2020Attention,
-  title={Vehicle Trajectory Prediction Using LSTMs with Spatial-Temporal Attention Mechanisms},
-  author={Lin, Lei and Li, Weizi and Bi, Huikun and Qin, Lingqiao},
-  journal={IEEE Intelligent Transportation Systems Magazine (ITSM)}
-}
+} 
 
 ```
