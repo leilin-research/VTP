@@ -1,0 +1,7 @@
+__pycache__/
+data
+trained_models
+artifacts
+log
+*copy
+*.sh

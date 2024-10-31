@@ -1,11 +1,14 @@
 from __future__ import print_function
 import torch
+import argparse
 from model import highwayNet
 from utils import ngsimDataset,maskedMSE
 from torch.utils.data import DataLoader
 import time
 import math
 import datetime
+import pandas as pd
+
 
 ## Network Arguments
 args = {}
@@ -29,16 +32,31 @@ if args['use_cuda']:
     net = net.cuda()
 
 
-## Initialize optimizer
-trainEpochs = 10
+# Create an ArgumentParser object
+parser = argparse.ArgumentParser(description="Hyperparameter settings for the model.")
+
+# Add arguments for each hyperparameter
+parser.add_argument('--trainEpochs', type=int, default=10, 
+                    help="Number of training epochs (default: 10)")
+parser.add_argument('--cav_ratio', type=float, default=0.4, 
+                    help="CAV ratio (default: 0.4)")
+parser.add_argument('--t_h', type=int, default=30, 
+                    help="Time horizon (default: 30)")
+
+
+
+# Parse the arguments
+hyperparms = parser.parse_args()
+# trainEpochs = 10
+trainEpochs = hyperparms.trainEpochs
 optimizer = torch.optim.Adam(net.parameters()) #lr = ...
 batch_size = 128
 crossEnt = torch.nn.BCELoss() # binary cross entropy
 
 
 ## Initialize data loaders
-trSet = ngsimDataset('../../data/trajectory/TrainSet.mat')
-valSet = ngsimDataset('../../data/trajectory/ValSet.mat')
+trSet = ngsimDataset('./data/sta_lstm/TrainSet.mat')
+valSet = ngsimDataset('./data/sta_lstm/ValSet.mat')
 trDataloader = DataLoader(trSet,batch_size=batch_size,shuffle=True,num_workers=8,collate_fn=trSet.collate_fn)
 valDataloader = DataLoader(valSet,batch_size=batch_size,shuffle=True,num_workers=8,collate_fn=valSet.collate_fn)
 
@@ -136,13 +154,26 @@ for epoch_num in range(trainEpochs):
         avg_val_loss += l.item()
         val_batch_count += 1
 
-    print(avg_val_loss/val_batch_count)
+    try:
+        print(avg_val_loss/val_batch_count)
 
-    # Print validation loss and update display variables
-    print('Validation loss :',format(avg_val_loss/val_batch_count,'0.4f'),"| Val Acc:",format(avg_val_lat_acc/val_batch_count*100,'0.4f'),format(avg_val_lon_acc/val_batch_count*100,'0.4f'))
-    val_loss.append(avg_val_loss/val_batch_count)
-    prev_val_loss = avg_val_loss/val_batch_count
+        # Print validation loss and update display variables
+        print('Validation loss :',format(avg_val_loss/val_batch_count,'0.4f'),"| Val Acc:",format(avg_val_lat_acc/val_batch_count*100,'0.4f'),format(avg_val_lon_acc/val_batch_count*100,'0.4f'))
+        val_loss.append(avg_val_loss/val_batch_count)
+        prev_val_loss = avg_val_loss/val_batch_count
 
+    except Exception as ex:
+        print("Ran into the exception:",str(ex))
+
+df_train_loss = pd.DataFrame({
+    'Training loss': train_loss,
+})
+df_train_loss.to_csv("./artifacts/sta_lstm/training_loss.csv",index=True)
+
+df_val_loss = pd.DataFrame({
+    'Validation loss': val_loss,
+})
+df_val_loss.to_csv("./artifacts/sta_lstm/validation_loss.csv",index=True)
 
 
 end_time = datetime.datetime.now()

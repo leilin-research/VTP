@@ -34,7 +34,7 @@ net.load_state_dict(torch.load('trained_models/sta_lstm_10272020.tar'))
 if args['use_cuda']:
     net = net.cuda()
 
-tsSet = ngsimDataset('../../data/trajectory/TestSet.mat')
+tsSet = ngsimDataset('./data/sta_lstm/TestSet.mat')
 tsDataloader = DataLoader(tsSet,batch_size=128,shuffle=True,num_workers=8,collate_fn=tsSet.collate_fn) # 
 
 lossVals = torch.zeros(5).cuda()
@@ -98,6 +98,11 @@ for i, data in enumerate(tsDataloader):
 
 
 print ('lossVal is:', lossVal)
+df_test_loss = pd.DataFrame({
+    'Test loss': lossVal.detach().cpu().numpy(),
+})
+df_test_loss.to_csv("./artifacts/sta_lstm/test_loss.csv",index=True)
+
 
 print(torch.pow(lossVal / count,0.5)*0.3048)   # Calculate RMSE and convert from feet to meters
 

@@ -96,6 +96,9 @@ class highwayNet(nn.Module):
         new_nbrs_hidden, soft_nbrs_attn_weights = self.attention(nbrs_lstm_weight, nbrs_out) 
         nbrs_enc = new_nbrs_hidden
 
+        if masks.dtype != torch.bool:
+            masks = masks.bool()
+            # print('Converted mask dtype:', masks.dtype)
 
         ## Masked scatter
         soc_enc = torch.zeros_like(masks).float() # mask size: (128, 3, 13, 64)
