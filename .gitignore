@@ -5,3 +5,4 @@ artifacts
 log
 *copy
 *.sh
+.venv
