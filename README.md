@@ -75,7 +75,7 @@
 </p>
 
 ## Questions or Issues
-If you encounter any questions or issues, please feel free to open an issue in this repository or reach out directly via email at craskoti@vols[dot]utk[dot]edu.
+If you encounter any questions or issues, please feel free to open an issue or reach out directly via email at craskoti@vols[dot]utk[dot]edu.
 
 ## Citation
 You are more than welcome to cite our papers:
