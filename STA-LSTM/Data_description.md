@@ -1,8 +1,5 @@
-
+# Trajectory Data
 ## Columns Description
-
-After processing, the dataset contains the following columns:
-
 1. **Dataset ID**
    - **Description:** Identifier for the dataset source.
    - **Values:** Integers from 1 to 6, corresponding to different datasets.
@@ -42,9 +39,35 @@ After processing, the dataset contains the following columns:
 
 
 ## Additional Information
-
-- **Data Frequency:**
-  - The dataset records vehicle positions at **10 frames per second**.
 - **Spatial Grid Details:**
   - **Longitudinal Range:** Each grid cell covers **15 meters**, spanning from **-90 meters** (behind) to **+90 meters** (ahead) relative to the subject vehicle.
 
+# Tracks Data
+
+The `tracks` data is a collection containing the complete trajectories of each vehicle in the dataset. It provides detailed temporal information about each vehicle's movement over time, focusing on:
+
+- **Frame Numbers**: The sequence of time frames during which the vehicle was observed.
+- **Local X Positions**: The lateral positions of the vehicle at each frame (in meters).
+- **Local Y Positions**: The longitudinal positions of the vehicle at each frame (in meters).
+
+## Structure of the `tracks` Data
+
+- The `tracks` data is organized as a cell array (or a dictionary) indexed by:
+
+  - **Dataset ID**: An integer from 1 to 6, indicating which dataset the vehicle belongs to.
+  - **Vehicle ID**: A unique identifier for each vehicle within a dataset.
+
+- Each entry in `tracks` corresponds to a specific vehicle and contains a matrix with:
+
+  - **Row 1**: Frame Numbers (timestamps).
+  - **Row 2**: Local X positions.
+  - **Row 3**: Local Y positions.
+
+- The data is transposed such that **columns represent time steps**, and **rows represent variables**.
+
+## Accessing the `tracks` Data
+
+To access the trajectory of a specific vehicle:
+
+```matlab
+vehicle_track = tracks{dataset_id, vehicle_id};
