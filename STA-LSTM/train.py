@@ -7,7 +7,6 @@ from torch.utils.data import DataLoader
 import time
 import math
 import datetime
-import pandas as pd
 
 
 ## Network Arguments
