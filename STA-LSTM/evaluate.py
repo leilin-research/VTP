@@ -98,11 +98,6 @@ for i, data in enumerate(tsDataloader):
 
 
 print ('lossVal is:', lossVal)
-df_test_loss = pd.DataFrame({
-    'Test loss': lossVal.detach().cpu().numpy(),
-})
-df_test_loss.to_csv("./artifacts/sta_lstm/test_loss.csv",index=True)
-
 
 print(torch.pow(lossVal / count,0.5)*0.3048)   # Calculate RMSE and convert from feet to meters
 

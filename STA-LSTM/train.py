@@ -47,7 +47,6 @@ parser.add_argument('--t_h', type=int, default=30,
 
 # Parse the arguments
 hyperparms = parser.parse_args()
-# trainEpochs = 10
 trainEpochs = hyperparms.trainEpochs
 optimizer = torch.optim.Adam(net.parameters()) #lr = ...
 batch_size = 128
@@ -165,23 +164,6 @@ for epoch_num in range(trainEpochs):
     except Exception as ex:
         print("Ran into the exception:",str(ex))
 
-df_train_loss = pd.DataFrame({
-    'Training loss': train_loss,
-})
-df_train_loss.to_csv("./artifacts/sta_lstm/training_loss.csv",index=True)
-
-df_val_loss = pd.DataFrame({
-    'Validation loss': val_loss,
-})
-df_val_loss.to_csv("./artifacts/sta_lstm/validation_loss.csv",index=True)
-
-
 end_time = datetime.datetime.now()
-
 print('Total training time: ', end_time-start_time)
-    #__________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
-
 torch.save(net.state_dict(), 'trained_models/sta_lstm_10272020.tar')
-
-
-
